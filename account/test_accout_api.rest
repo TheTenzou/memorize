@@ -1,0 +1,22 @@
+GET http://localhost/api/account/me
+
+###
+POST http://localhost/api/account/signup
+
+###
+POST http://localhost/api/account/signin
+
+###
+POST http://localhost/api/account/signout
+
+###
+POST http://localhost/api/account/tokens
+
+###
+POST http://localhost/api/account/image
+
+###
+DELETE  http://localhost/api/account/image
+
+###
+PUT  http://localhost/api/account/details
