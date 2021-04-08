@@ -9,9 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	// "./handler"
+	"memorize/handler"
 
-	"github.com/TheTenzou/memorize/handler"
 	"github.com/gin-gonic/gin"
 )
 
