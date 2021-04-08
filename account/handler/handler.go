@@ -3,20 +3,27 @@ package handler
 import (
 	"net/http"
 
+	"memorize/model"
+
 	"github.com/gin-gonic/gin"
 )
 
-type Handler struct{}
+type Handler struct {
+	UserService model.UserService
+}
 
 type Config struct {
-	R *gin.Engine
+	Router      *gin.Engine
+	UserService model.UserService
 }
 
 func NewHandler(c *Config) {
 
-	h := &Handler{}
+	h := &Handler{
+		UserService: c.UserService,
+	}
 
-	g := c.R.Group("/api/account")
+	g := c.Router.Group("/api/account")
 
 	g.GET("/me", h.Me)
 	g.POST("/signup", h.Signup)
@@ -26,12 +33,6 @@ func NewHandler(c *Config) {
 	g.POST("/image", h.Image)
 	g.DELETE("/image", h.DeleteImage)
 	g.PUT("/details", h.Details)
-}
-
-func (h *Handler) Me(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"hello": "it's me",
-	})
 }
 
 func (h *Handler) Signup(c *gin.Context) {

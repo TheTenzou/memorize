@@ -20,7 +20,7 @@ func main() {
 	router := gin.Default()
 
 	handler.NewHandler(&handler.Config{
-		R: router,
+		Router: router,
 	})
 
 	srv := &http.Server{
