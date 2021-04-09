@@ -32,7 +32,7 @@ func TestMe(t *testing.T) {
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On("Get", mock.AnythingOfType("*gin.Context"), uid).Return(mockUserResp, nil)
 
-		rr := httptest.NewRecorder()
+		recorder := httptest.NewRecorder()
 
 		router := gin.Default()
 		router.Use(func(c *gin.Context) {
@@ -50,7 +50,7 @@ func TestMe(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		router.ServeHTTP(rr, request)
+		router.ServeHTTP(recorder, request)
 
 		respBody, err := json.Marshal(gin.H{
 			"user": mockUserResp,
@@ -58,8 +58,8 @@ func TestMe(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		assert.Equal(t, 200, rr.Code)
-		assert.Equal(t, respBody, rr.Body.Bytes())
+		assert.Equal(t, 200, recorder.Code)
+		assert.Equal(t, respBody, recorder.Body.Bytes())
 		mockUserService.AssertExpectations(t)
 	})
 
@@ -67,7 +67,7 @@ func TestMe(t *testing.T) {
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On("Get", mock.Anything, mock.Anything).Return(nil, nil)
 
-		rr := httptest.NewRecorder()
+		recorder := httptest.NewRecorder()
 
 		router := gin.Default()
 		NewHandler(&Config{
@@ -78,9 +78,9 @@ func TestMe(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/api/account/me", nil)
 		assert.NoError(t, err)
 
-		router.ServeHTTP(rr, request)
+		router.ServeHTTP(recorder, request)
 
-		assert.Equal(t, 500, rr.Code)
+		assert.Equal(t, 500, recorder.Code)
 		mockUserService.AssertNotCalled(t, "Get", mock.Anything)
 	})
 
@@ -89,7 +89,7 @@ func TestMe(t *testing.T) {
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On("Get", mock.Anything, uid).Return(nil, fmt.Errorf("Some error down call chain"))
 
-		rr := httptest.NewRecorder()
+		recorder := httptest.NewRecorder()
 
 		router := gin.Default()
 		router.Use(func(c *gin.Context) {
@@ -106,7 +106,7 @@ func TestMe(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/api/account/me", nil)
 		assert.NoError(t, err)
 
-		router.ServeHTTP(rr, request)
+		router.ServeHTTP(recorder, request)
 
 		respErr := apperrors.NewNotFound("user", uid.String())
 
@@ -116,8 +116,8 @@ func TestMe(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		assert.Equal(t, respErr.Status(), rr.Code)
-		assert.Equal(t, respBody, rr.Body.Bytes())
+		assert.Equal(t, respErr.Status(), recorder.Code)
+		assert.Equal(t, respBody, recorder.Body.Bytes())
 		mockUserService.AssertExpectations(t)
 	})
 }
