@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"memorize/mocks"
 	"memorize/model"
 	"memorize/model/apperrors"
-	"memorize/model/mocks"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
