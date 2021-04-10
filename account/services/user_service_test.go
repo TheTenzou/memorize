@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"memorize/mocks"
 	"memorize/models"
+	"memorize/models/apperrors"
 	"testing"
 
 	"github.com/google/uuid"
@@ -54,5 +55,74 @@ func TestGet(t *testing.T) {
 		assert.Nil(t, user)
 		assert.Error(t, err)
 		mockUserRepository.AssertExpectations(t)
+	})
+}
+
+func TestSignup(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &models.User{
+			Login:    "alice",
+			Password: "alicepassword",
+		}
+
+		mockUserRepository := new(mocks.MockUserRepository)
+		userservice := NewUserService(&UserServiceConfig{
+			UserRepository: mockUserRepository,
+		})
+
+		mockUserRepository.
+			On(
+				"Create",
+				mock.AnythingOfType("*context.emptyCtx"),
+				mockUser,
+			).
+			Run(
+				func(args mock.Arguments) {
+					// arg 0 is context, arg 1 is *User
+					userArg := args.Get(1).(*models.User)
+					userArg.UID = uid
+				},
+			).
+			Return(nil)
+
+		ctx := context.TODO()
+		err := userservice.Signup(ctx, mockUser)
+
+		assert.NoError(test, err)
+
+		assert.Equal(test, uid, mockUser.UID)
+
+		mockUserRepository.AssertExpectations(test)
+	})
+
+	test.Run("Error", func(test *testing.T) {
+		mockUser := &models.User{
+			Login:    "alice",
+			Password: "alicepassword",
+		}
+
+		mockUserRepository := new(mocks.MockUserRepository)
+		us := NewUserService(&UserServiceConfig{
+			UserRepository: mockUserRepository,
+		})
+
+		mockErr := apperrors.NewConflict("login", mockUser.Login)
+
+		mockUserRepository.
+			On(
+				"Create",
+				mock.AnythingOfType("*context.emptyCtx"),
+				mockUser,
+			).
+			Return(mockErr)
+
+		ctx := context.TODO()
+		err := us.Signup(ctx, mockUser)
+
+		assert.EqualError(test, err, mockErr.Error())
+
+		mockUserRepository.AssertExpectations(test)
 	})
 }
