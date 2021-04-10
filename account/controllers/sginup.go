@@ -14,7 +14,7 @@ type signinRequest struct {
 	Password string `json:"password" binding:"required,gte=6,lte=30"`
 }
 
-func (c *Controller) Signup(context *gin.Context) {
+func (c *controller) Signup(context *gin.Context) {
 	var request signinRequest
 
 	if ok := bindData(context, &request); !ok {

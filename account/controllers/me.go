@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (c *Controller) Me(context *gin.Context) {
+func (c *controller) Me(context *gin.Context) {
 	user, exists := context.Get("user")
 
 	if !exists {
