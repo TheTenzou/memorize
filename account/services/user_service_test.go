@@ -1,10 +1,10 @@
-package service
+package services
 
 import (
 	"context"
 	"fmt"
 	"memorize/mocks"
-	"memorize/model"
+	"memorize/models"
 	"testing"
 
 	"github.com/google/uuid"
@@ -16,7 +16,7 @@ func TestGet(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		uid, _ := uuid.NewRandom()
 
-		mockUserResponce := &model.User{
+		mockUserResponce := &models.User{
 			UID:   uid,
 			Email: "Alice@alice.com",
 			Name:  "Alice",

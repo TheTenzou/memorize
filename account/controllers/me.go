@@ -1,17 +1,17 @@
-package handler
+package controllers
 
 import (
 	"log"
 	"net/http"
 
-	"memorize/model"
+	"memorize/models"
 
-	"memorize/model/apperrors"
+	"memorize/models/apperrors"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) Me(c *gin.Context) {
+func (h *Controller) Me(c *gin.Context) {
 	user, exists := c.Get("user")
 
 	if !exists {
@@ -24,7 +24,7 @@ func (h *Handler) Me(c *gin.Context) {
 		return
 	}
 
-	uid := user.(*model.User).UID
+	uid := user.(*models.User).UID
 
 	u, err := h.UserService.Get(c, uid)
 

@@ -1,4 +1,4 @@
-package handler
+package controllers
 
 import (
 	"encoding/json"
@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"memorize/mocks"
-	"memorize/model"
-	"memorize/model/apperrors"
+	"memorize/models"
+	"memorize/models/apperrors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -23,7 +23,7 @@ func TestMe(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		uid, _ := uuid.NewRandom()
 
-		mockUserResp := &model.User{
+		mockUserResp := &models.User{
 			UID:   uid,
 			Email: "alice@alice.com",
 			Name:  "Alice",
@@ -36,12 +36,12 @@ func TestMe(t *testing.T) {
 
 		router := gin.Default()
 		router.Use(func(c *gin.Context) {
-			c.Set("user", &model.User{
+			c.Set("user", &models.User{
 				UID: uid,
 			})
 		})
 
-		NewHandler(&Config{
+		NewController(&Config{
 			Router:      router,
 			UserService: mockUserService,
 		})
@@ -70,7 +70,7 @@ func TestMe(t *testing.T) {
 		recorder := httptest.NewRecorder()
 
 		router := gin.Default()
-		NewHandler(&Config{
+		NewController(&Config{
 			Router:      router,
 			UserService: mockUserService,
 		})
@@ -93,12 +93,12 @@ func TestMe(t *testing.T) {
 
 		router := gin.Default()
 		router.Use(func(c *gin.Context) {
-			c.Set("user", &model.User{
+			c.Set("user", &models.User{
 				UID: uid,
 			})
 		})
 
-		NewHandler(&Config{
+		NewController(&Config{
 			Router:      router,
 			UserService: mockUserService,
 		})

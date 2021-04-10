@@ -1,25 +1,25 @@
-package handler
+package controllers
 
 import (
 	"net/http"
 
-	"memorize/model"
+	"memorize/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Handler struct {
-	UserService model.UserService
+type Controller struct {
+	UserService models.UserService
 }
 
 type Config struct {
 	Router      *gin.Engine
-	UserService model.UserService
+	UserService models.UserService
 }
 
-func NewHandler(c *Config) {
+func NewController(c *Config) {
 
-	h := &Handler{
+	h := &Controller{
 		UserService: c.UserService,
 	}
 
@@ -35,43 +35,43 @@ func NewHandler(c *Config) {
 	g.PUT("/details", h.Details)
 }
 
-func (h *Handler) Signup(c *gin.Context) {
+func (h *Controller) Signup(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's signup",
 	})
 }
 
-func (h *Handler) Signin(c *gin.Context) {
+func (h *Controller) Signin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's signin",
 	})
 }
 
-func (h *Handler) Signout(c *gin.Context) {
+func (h *Controller) Signout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's signout",
 	})
 }
 
-func (h *Handler) Tokens(c *gin.Context) {
+func (h *Controller) Tokens(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's tokens",
 	})
 }
 
-func (h *Handler) Image(c *gin.Context) {
+func (h *Controller) Image(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's image",
 	})
 }
 
-func (h *Handler) DeleteImage(c *gin.Context) {
+func (h *Controller) DeleteImage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's delete image",
 	})
 }
 
-func (h *Handler) Details(c *gin.Context) {
+func (h *Controller) Details(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's details",
 	})

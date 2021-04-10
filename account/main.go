@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"memorize/handler"
+	"memorize/controllers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,7 @@ func main() {
 
 	router := gin.Default()
 
-	handler.NewHandler(&handler.Config{
+	controllers.NewController(&controllers.Config{
 		Router: router,
 	})
 
@@ -38,7 +38,7 @@ func main() {
 	log.Printf("Listening on port %v\n", srv.Addr)
 
 	// wait for kill signal of channel
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 10)
 
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
