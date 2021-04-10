@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGet(t *testing.T) {
-	t.Run("Success", func(t *testing.T) {
+func TestGet(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
 		uid, _ := uuid.NewRandom()
 
 		mockUserResponce := &models.User{
@@ -33,12 +33,12 @@ func TestGet(t *testing.T) {
 		ctx := context.TODO()
 		user, err := userService.Get(ctx, uid)
 
-		assert.NoError(t, err)
-		assert.Equal(t, user, mockUserResponce)
-		mockUserRepository.AssertExpectations(t)
+		assert.NoError(test, err)
+		assert.Equal(test, user, mockUserResponce)
+		mockUserRepository.AssertExpectations(test)
 	})
 
-	t.Run("Error", func(t *testing.T) {
+	test.Run("Error", func(test *testing.T) {
 		uid, _ := uuid.NewRandom()
 
 		mockUserRepository := new(mocks.MockUserRepository)
@@ -52,9 +52,9 @@ func TestGet(t *testing.T) {
 
 		user, err := userService.Get(ctx, uid)
 
-		assert.Nil(t, user)
-		assert.Error(t, err)
-		mockUserRepository.AssertExpectations(t)
+		assert.Nil(test, user)
+		assert.Error(test, err)
+		mockUserRepository.AssertExpectations(test)
 	})
 }
 
