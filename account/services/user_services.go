@@ -2,7 +2,9 @@ package services
 
 import (
 	"context"
+	"log"
 	"memorize/models"
+	"memorize/models/apperrors"
 
 	"github.com/google/uuid"
 )
@@ -28,5 +30,18 @@ func (u *UserService) Get(ctx context.Context, uid uuid.UUID) (*models.User, err
 }
 
 func (u *UserService) Signup(ctx context.Context, user *models.User) error {
-	panic("Method not implemented")
+	password, err := hashPassword(user.Password)
+
+	if err != nil {
+		log.Printf("Unable to signup user for login: %v\n", user.Login)
+		return apperrors.NewInternal()
+	}
+
+	user.Password = password
+
+	if err := u.UserRespository.Create(ctx, user); err != nil {
+		return err
+	}
+
+	return nil
 }
