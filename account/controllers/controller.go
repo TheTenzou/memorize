@@ -35,12 +35,6 @@ func NewController(c *Config) {
 	g.PUT("/details", h.Details)
 }
 
-func (h *Controller) Signup(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"hello": "it's signup",
-	})
-}
-
 func (h *Controller) Signin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's signin",

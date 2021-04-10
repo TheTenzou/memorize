@@ -28,3 +28,14 @@ func (m *MockUserService) Get(ctx context.Context, uid uuid.UUID) (*models.User,
 
 	return r0, r1
 }
+
+func (m *MockUserService) Signup(ctx context.Context, user *models.User) error {
+	args := m.Called(ctx, user)
+
+	var r0 error
+	if args.Get(0) != nil {
+		r0 = args.Get(0).(error)
+	}
+
+	return r0
+}

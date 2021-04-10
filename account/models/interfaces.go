@@ -7,9 +7,10 @@ import (
 )
 
 type UserService interface {
-	Get(context context.Context, uid uuid.UUID) (*User, error)
+	Get(context.Context, uuid.UUID) (*User, error)
+	Signup(context.Context, *User) error
 }
 
 type UserRepository interface {
-	FindByID(context context.Context, uid uuid.UUID) (*User, error)
+	FindByID(context.Context, uuid.UUID) (*User, error)
 }
