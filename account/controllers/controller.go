@@ -9,64 +9,67 @@ import (
 )
 
 type Controller struct {
-	UserService models.UserService
+	UserService  models.UserService
+	TokenService models.TokenService
 }
 
 type Config struct {
-	Router      *gin.Engine
-	UserService models.UserService
+	Router       *gin.Engine
+	UserService  models.UserService
+	TokenService models.TokenService
 }
 
-func NewController(c *Config) {
+func NewController(config *Config) {
 
-	h := &Controller{
-		UserService: c.UserService,
+	controller := &Controller{
+		UserService:  config.UserService,
+		TokenService: config.TokenService,
 	}
 
-	g := c.Router.Group("/api/account")
+	g := config.Router.Group("/api/account")
 
-	g.GET("/me", h.Me)
-	g.POST("/signup", h.Signup)
-	g.POST("/signin", h.Signin)
-	g.POST("/sigout", h.Signout)
-	g.POST("/tokens", h.Tokens)
-	g.POST("/image", h.Image)
-	g.DELETE("/image", h.DeleteImage)
-	g.PUT("/details", h.Details)
+	g.GET("/me", controller.Me)
+	g.POST("/signup", controller.Signup)
+	g.POST("/signin", controller.Signin)
+	g.POST("/sigout", controller.Signout)
+	g.POST("/tokens", controller.Tokens)
+	g.POST("/image", controller.Image)
+	g.DELETE("/image", controller.DeleteImage)
+	g.PUT("/details", controller.Details)
 }
 
-func (h *Controller) Signin(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func (c *Controller) Signin(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{
 		"hello": "it's signin",
 	})
 }
 
-func (h *Controller) Signout(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func (c *Controller) Signout(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{
 		"hello": "it's signout",
 	})
 }
 
-func (h *Controller) Tokens(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func (c *Controller) Tokens(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{
 		"hello": "it's tokens",
 	})
 }
 
-func (h *Controller) Image(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func (c *Controller) Image(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{
 		"hello": "it's image",
 	})
 }
 
-func (h *Controller) DeleteImage(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func (c *Controller) DeleteImage(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{
 		"hello": "it's delete image",
 	})
 }
 
-func (h *Controller) Details(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"hello": "it's details",
+func (c *Controller) Details(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{
+		"cello": "it's details",
 	})
 }
