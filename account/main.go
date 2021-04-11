@@ -8,20 +8,22 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"memorize/controllers"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	log.Println("Starting server....")
 
-	router := gin.Default()
+	dataSources, err := initDataSources()
 
-	controllers.NewController(&controllers.Config{
-		Router: router,
-	})
+	if err != nil {
+		log.Fatalf("Unable to initialze data sources: %v\n", err)
+	}
+
+	router, err := inject(dataSources)
+
+	if err != nil {
+		log.Fatalf("Failure to inject data sources: %v\n", err)
+	}
 
 	srv := &http.Server{
 		Addr:    ":8080",
@@ -50,6 +52,10 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 	defer cancel()
+
+	if err := dataSources.close(); err != nil {
+		log.Fatalf("A problem occured gracefully shutting down data sources: %v\n", err)
+	}
 
 	// Shutdown server
 	log.Println("Shutting down server....")

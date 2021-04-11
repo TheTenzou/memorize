@@ -21,10 +21,10 @@ func NewUserRepository(db *sqlx.DB) models.UserRepository {
 	}
 }
 
-func (this *pgUserRepository) Create(ctx context.Context, user *models.User) error {
-	query := "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *"
+func (repository *pgUserRepository) Create(ctx context.Context, user *models.User) error {
+	query := "INSERT INTO users (login, password) VALUES ($1, $2) RETURNING *"
 
-	if err := this.DB.Get(user, query, user.Login, user.Password); err != nil {
+	if err := repository.DB.Get(user, query, user.Login, user.Password); err != nil {
 
 		if err, ok := err.(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 			log.Printf(
