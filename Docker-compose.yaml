@@ -1,7 +1,7 @@
 version: "3.8"
 
 volumes: 
-  pgdata_auth:
+  pgdata_account:
 
 services:
 
@@ -22,27 +22,26 @@ services:
       context: ./account
       target: builder
     image: account
+    env_file: ./account/.dev.env
+    environment:
+      - ENV=dev
+      - POSTGRES_HOST=postgres-account
     expose:
       - "8080"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.account.rule=Host(`localhost`) && PathPrefix(`/api/account`)"
-    environment:
-      - ENV=dev
     volumes:
       - ./account:/go/src/app
     depends_on:
-      - postgres-auth
+      - postgres-account
     command: reflex -r "\.go$$" -s -- sh -c "go run ./"
   
-  postgres-auth:
+  postgres-account:
     image: "postgres:alpine"
-    environment:
-      POSTGRES_DB: users
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+    env_file: ./account/.dev.env
     ports:
       - "5432:5432"
     volumes:
-      - "pgdata_auth:/var/lib/postgresql/data"
+      - "pgdata_account:/var/lib/postgresql/data"
     command: ["postgres", "-c", "log_statement=all"]

@@ -2,6 +2,12 @@ GET http://localhost/api/account/me
 
 ###
 POST http://localhost/api/account/signup
+Content-Type: application/json
+
+{
+    "login": "alice",
+    "password": "alicePass"
+}
 
 ###
 POST http://localhost/api/account/signin
