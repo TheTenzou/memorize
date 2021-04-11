@@ -42,12 +42,12 @@ func (repository *pgUserRepository) Create(ctx context.Context, user *models.Use
 	return nil
 }
 
-func (this *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*models.User, error) {
+func (repository *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*models.User, error) {
 	user := &models.User{}
 
 	query := "SELECT * FROM users WHERE uid=&1"
 
-	if err := this.DB.Get(user, query, uid); err != nil {
+	if err := repository.DB.Get(user, query, uid); err != nil {
 		return user, apperrors.NewNotFound("uid", uid.String())
 	}
 
