@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"memorize/inject"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,31 +14,36 @@ import (
 func main() {
 	log.Println("Starting server....")
 
-	dataSources, err := initDataSources()
-
+	dataSources, err := inject.InitDataSources()
 	if err != nil {
 		log.Fatalf("Unable to initialze data sources: %v\n", err)
 	}
 
-	router, err := inject(dataSources)
+	repositories := inject.InitRepositories(dataSources)
 
+	services, err := inject.InitServices(repositories)
 	if err != nil {
-		log.Fatalf("Failure to inject data sources: %v\n", err)
+		log.Fatalf("Unable to initilaze services: %v\n", err)
 	}
 
-	srv := &http.Server{
+	router := inject.InitRouter(services)
+
+	server := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
 	}
 
-	// Graceful server shutdown
+	gracefullyShutdown(dataSources, server)
+}
+
+func gracefullyShutdown(dataSources *inject.DataSources, server *http.Server) {
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Failed to initilize server: %v\n", err)
 		}
 	}()
 
-	log.Printf("Listening on port %v\n", srv.Addr)
+	log.Printf("Listening on port %v\n", server.Addr)
 
 	// wait for kill signal of channel
 	quit := make(chan os.Signal, 10)
@@ -53,14 +59,13 @@ func main() {
 
 	defer cancel()
 
-	if err := dataSources.close(); err != nil {
+	if err := dataSources.Close(); err != nil {
 		log.Fatalf("A problem occured gracefully shutting down data sources: %v\n", err)
 	}
 
 	// Shutdown server
 	log.Println("Shutting down server....")
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := server.Shutdown(ctx); err != nil {
 		log.Fatalf("Server forced to shutdown: %v\n", err)
 	}
-
 }

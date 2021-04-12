@@ -1,28 +1,39 @@
-package main
+package inject
 
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
-	"memorize/controllers"
-	"memorize/repository"
-	"memorize/services"
+	"memorize/models"
+	"memorize/service"
 	"os"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 )
 
-func inject(sources *dataSources) (*gin.Engine, error) {
-	log.Println("Injecting data sources")
+type Services struct {
+	UserService  models.UserService
+	TokenService models.TokenService
+}
 
-	userRepository := repository.NewUserRepository(sources.DB)
-	tokenRepository := repository.NewTokenRepository(sources.RedisClient)
+func InitServices(repositories *Repositories) (*Services, error) {
 
-	userService := services.NewUserService(&services.UserServiceConfig{
-		UserRepository: userRepository,
+	userService := service.NewUserService(&service.UserServiceConfig{
+		UserRepository: repositories.UserRepository,
 	})
+
+	tokenService, err := initTokenService(repositories.TokenRepository)
+	if err != nil {
+		return nil, fmt.Errorf("faild to init tokenService: %w", err)
+	}
+
+	return &Services{
+		UserService:  userService,
+		TokenService: tokenService,
+	}, nil
+}
+
+func initTokenService(tokenRepository models.TokenRepository) (models.TokenService, error) {
 
 	privateKeyFile := os.Getenv("PRIVATE_KEY_FILE")
 	privateKeyString, err := ioutil.ReadFile(privateKeyFile)
@@ -64,24 +75,12 @@ func inject(sources *dataSources) (*gin.Engine, error) {
 		return nil, fmt.Errorf("could not parse REFRESH_TOKEN_EXP as int: %v", err)
 	}
 
-	tokenService := services.NewTokenService(&services.TokenServiceConfig{
+	return service.NewTokenService(&service.TokenServiceConfig{
 		TokenRepository:           tokenRepository,
 		PrivateKey:                privateKey,
 		PublicKey:                 publicKey,
 		RefreshSecret:             refreshSecret,
 		TokenExpirationSec:        tokenExpirationSec,
 		RefreshTokenExpirationSec: refreshTokenExpirationSec,
-	})
-
-	router := gin.Default()
-
-	baseUrl := os.Getenv("ACCOUNT_API_URL")
-	controllers.NewController(&controllers.Config{
-		Router:       router,
-		UserService:  userService,
-		TokenService: tokenService,
-		BaseURL:      baseUrl,
-	})
-
-	return router, nil
+	}), nil
 }

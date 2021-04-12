@@ -1,4 +1,4 @@
-package main
+package inject
 
 import (
 	"context"
@@ -10,12 +10,43 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type dataSources struct {
+type DataSources struct {
 	DB          *sqlx.DB
 	RedisClient *redis.Client
 }
 
-func initDataSources() (*dataSources, error) {
+func InitDataSources() (*DataSources, error) {
+
+	database, err := initPostgres()
+	if err != nil {
+		return nil, err
+	}
+
+	redisDB, err := initRedis()
+	if err != nil {
+		return nil, err
+	}
+
+	return &DataSources{
+		DB:          database,
+		RedisClient: redisDB,
+	}, nil
+}
+
+func (d *DataSources) Close() error {
+	if err := d.DB.Close(); err != nil {
+		return fmt.Errorf("error closing Postgresql: %w", err)
+	}
+
+	if err := d.RedisClient.Close(); err != nil {
+		return fmt.Errorf("error closing Redis clinet: %w", err)
+	}
+
+	return nil
+}
+
+func initPostgres() (*sqlx.DB, error) {
+
 	log.Printf("Initilazing data sources\n")
 
 	pgHost := os.Getenv("POSTGRES_HOST")
@@ -31,15 +62,20 @@ func initDataSources() (*dataSources, error) {
 	)
 
 	log.Printf("Connecting to Postgresql\n")
-	db, err := sqlx.Open("postgres", pgConnString)
+	database, err := sqlx.Open("postgres", pgConnString)
 
 	if err != nil {
 		return nil, fmt.Errorf("error opening db: %w", err)
 	}
 
-	if err := db.Ping(); err != nil {
+	if err := database.Ping(); err != nil {
 		return nil, fmt.Errorf("error connecting to db: %w", err)
 	}
+
+	return database, nil
+}
+
+func initRedis() (*redis.Client, error) {
 
 	redisHost := os.Getenv("REDIS_HOST")
 	redisPort := os.Getenv("REDIS_PORT")
@@ -51,26 +87,11 @@ func initDataSources() (*dataSources, error) {
 		DB:       0,
 	})
 
-	_, err = redisDB.Ping(context.Background()).Result()
+	_, err := redisDB.Ping(context.Background()).Result()
 
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to redis: %w", err)
 	}
 
-	return &dataSources{
-		DB:          db,
-		RedisClient: redisDB,
-	}, nil
-}
-
-func (d *dataSources) close() error {
-	if err := d.DB.Close(); err != nil {
-		return fmt.Errorf("error closing Postgresql: %w", err)
-	}
-
-	if err := d.RedisClient.Close(); err != nil {
-		return fmt.Errorf("error closing Redis clinet: %w", err)
-	}
-
-	return nil
+	return redisDB, nil
 }
