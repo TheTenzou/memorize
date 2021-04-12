@@ -26,7 +26,11 @@ func main() {
 		log.Fatalf("Unable to initilaze services: %v\n", err)
 	}
 
-	router := inject.InitRouter(services)
+	router, err := inject.InitRouter(services)
+
+	if err != nil {
+		log.Fatalf("Unable to initilaze router: %v\n", err)
+	}
 
 	server := &http.Server{
 		Addr:    ":8080",
