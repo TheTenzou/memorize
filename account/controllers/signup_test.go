@@ -43,7 +43,7 @@ func TestSignup(test *testing.T) {
 
 		request, err := http.NewRequest(
 			http.MethodPost,
-			"/api/account/signup",
+			"/signup",
 			bytes.NewBuffer(requestBody),
 		)
 		assert.NoError(test, err)
@@ -82,7 +82,7 @@ func TestSignup(test *testing.T) {
 
 		request, err := http.NewRequest(
 			http.MethodPost,
-			"/api/account/signup",
+			"/signup",
 			bytes.NewBuffer(requestBody),
 		)
 		assert.NoError(test, err)
@@ -121,7 +121,7 @@ func TestSignup(test *testing.T) {
 
 		request, err := http.NewRequest(
 			http.MethodPost,
-			"/api/account/signup",
+			"/signup",
 			bytes.NewBuffer(requestBody),
 		)
 		assert.NoError(test, err)
@@ -165,7 +165,7 @@ func TestSignup(test *testing.T) {
 
 		request, err := http.NewRequest(
 			http.MethodPost,
-			"/api/account/signup",
+			"/signup",
 			bytes.NewBuffer(requestBody),
 		)
 		assert.NoError(test, err)
@@ -222,7 +222,7 @@ func TestSignup(test *testing.T) {
 
 		request, err := http.NewRequest(
 			http.MethodPost,
-			"/api/account/signup",
+			"/signup",
 			bytes.NewBuffer(requestBody),
 		)
 		assert.NoError(test, err)
@@ -284,7 +284,7 @@ func TestSignup(test *testing.T) {
 
 		request, err := http.NewRequest(
 			http.MethodPost,
-			"/api/account/signup",
+			"/signup",
 			bytes.NewBuffer(requestBody),
 		)
 		assert.NoError(test, err)

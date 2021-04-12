@@ -58,10 +58,12 @@ func inject(sources *dataSources) (*gin.Engine, error) {
 
 	router := gin.Default()
 
+	baseUrl := os.Getenv("ACCOUNT_API_URL")
 	controllers.NewController(&controllers.Config{
 		Router:       router,
 		UserService:  userService,
 		TokenService: tokenService,
+		BaseURL:      baseUrl,
 	})
 
 	return router, nil

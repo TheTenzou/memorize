@@ -17,6 +17,7 @@ type Config struct {
 	Router       *gin.Engine
 	UserService  models.UserService
 	TokenService models.TokenService
+	BaseURL      string
 }
 
 func NewController(config *Config) {
@@ -26,7 +27,7 @@ func NewController(config *Config) {
 		TokenService: config.TokenService,
 	}
 
-	g := config.Router.Group("/api/account")
+	g := config.Router.Group(config.BaseURL)
 
 	g.GET("/me", ctrl.Me)
 	g.POST("/signup", ctrl.Signup)
