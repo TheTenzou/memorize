@@ -40,7 +40,7 @@ services:
     depends_on:
       - postgres-account
       - redis-account
-    command: reflex -r "\.go$$" -s -- sh -c "go run ./"
+    command: ./wait-for.sh redis-account:6379 -- ./wait-for.sh postgres-account:5432 -- reflex -r "\.go$$" -s -- sh -c "go run ./"
 
   redis-account:
     image: "redis:alpine"
