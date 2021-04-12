@@ -19,9 +19,9 @@ func TestNewPairFromUser(test *testing.T) {
 	var tokenExpiration int64 = 15 * 60
 	var refreshTokenExpiration int64 = 3 * 24 * 60 * 60
 
-	privateRSA, _ := ioutil.ReadFile("../rsa_private_test.pem")
+	privateRSA, _ := ioutil.ReadFile("../rsa/rsa_private_test.pem")
 	privateKey, _ := jwt.ParseRSAPrivateKeyFromPEM(privateRSA)
-	publicRSA, _ := ioutil.ReadFile("../rsa_public_test.pem")
+	publicRSA, _ := ioutil.ReadFile("../rsa/rsa_public_test.pem")
 	publicKey, _ := jwt.ParseRSAPublicKeyFromPEM(publicRSA)
 	secret := "verysecretsecret"
 
