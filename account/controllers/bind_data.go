@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"memorize/models/apperrors"
 
@@ -16,6 +17,19 @@ type invalidArgument struct {
 }
 
 func bindData(c *gin.Context, request interface{}) bool {
+
+	if c.ContentType() != "application/json" {
+		message := fmt.Sprintf("%s only accepts Content-Type application/json", c.FullPath())
+
+		err := apperrors.NewUnsupportedMediaType(message)
+
+		c.JSON(err.Status(), gin.H{
+			"error": err,
+		})
+
+		return false
+	}
+
 	if err := c.ShouldBind(request); err != nil {
 		log.Printf("Error binding data: %v\n", err)
 
