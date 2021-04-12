@@ -19,9 +19,9 @@ type UserServiceConfig struct {
 }
 
 // factory function for initializing a UserService with its repository layer dependencies
-func NewUserService(c *UserServiceConfig) models.UserService {
+func NewUserService(config *UserServiceConfig) models.UserService {
 	return &userService{
-		UserRespository: c.UserRepository,
+		UserRespository: config.UserRepository,
 	}
 }
 
@@ -48,4 +48,8 @@ func (u *userService) Signup(ctx context.Context, user *models.User) error {
 	}
 
 	return nil
+}
+
+func (u *userService) Signin(ctx context.Context, user *models.User) error {
+	panic("Not implemented")
 }

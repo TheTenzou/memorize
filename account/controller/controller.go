@@ -49,13 +49,6 @@ func NewController(config *Config) {
 	group.PUT("/details", ctrl.Details)
 }
 
-func (c *controller) Signin(context *gin.Context) {
-	time.Sleep(6 * time.Second) // for testing
-	context.JSON(http.StatusOK, gin.H{
-		"hello": "it's signin",
-	})
-}
-
 func (c *controller) Signout(context *gin.Context) {
 	time.Sleep(2 * time.Second) // for testing
 	context.JSON(http.StatusOK, gin.H{

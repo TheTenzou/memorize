@@ -13,6 +13,8 @@ type UserService interface {
 	GetUser(context.Context, uuid.UUID) (*User, error)
 	// signup user if login avaliable
 	Signup(context.Context, *User) error
+	// signin user if credentials are right
+	Signin(context.Context, *User) error
 }
 
 // TokenService defines methods the handler layer expects
