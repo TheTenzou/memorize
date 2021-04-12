@@ -26,7 +26,8 @@ func (c *controller) Signup(context *gin.Context) {
 		Password: request.Password,
 	}
 
-	err := c.UserService.Signup(context, user)
+	requestContext := context.Request.Context()
+	err := c.UserService.Signup(requestContext, user)
 
 	if err != nil {
 		log.Printf("Faild to sign up user: %v\n", err.Error())
@@ -36,7 +37,7 @@ func (c *controller) Signup(context *gin.Context) {
 		return
 	}
 
-	tokens, err := c.TokenService.NewPairFromUser(context, user, "")
+	tokens, err := c.TokenService.NewPairFromUser(requestContext, user, "")
 
 	if err != nil {
 		log.Printf("Failded to create tokens for user: %v\n", err.Error())

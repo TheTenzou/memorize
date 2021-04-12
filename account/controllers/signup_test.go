@@ -22,7 +22,7 @@ func TestSignup(test *testing.T) {
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On(
 			"Signup",
-			mock.AnythingOfType("*gin.Context"),
+			mock.AnythingOfType("*context.emptyCtx"),
 			mock.AnythingOfType("*models.User"),
 		).Return(nil)
 
@@ -60,7 +60,7 @@ func TestSignup(test *testing.T) {
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On(
 			"Signup",
-			mock.AnythingOfType("*gin.Context"),
+			mock.AnythingOfType("*context.emptyCtx"),
 			mock.AnythingOfType("*models.User"),
 		).Return(nil)
 
@@ -99,7 +99,7 @@ func TestSignup(test *testing.T) {
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On(
 			"Signup",
-			mock.AnythingOfType("*gin.Context"),
+			mock.AnythingOfType("*context.emptyCtx"),
 			mock.AnythingOfType("*models.User"),
 		).Return(nil)
 
@@ -143,7 +143,7 @@ func TestSignup(test *testing.T) {
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On(
 			"Signup",
-			mock.AnythingOfType("*gin.Context"),
+			mock.AnythingOfType("*context.emptyCtx"),
 			mock.AnythingOfType("*models.User"),
 		).Return(apperrors.NewConflict("User Already Exits", user.Login))
 
@@ -194,12 +194,12 @@ func TestSignup(test *testing.T) {
 
 		mockUserService.On(
 			"Signup",
-			mock.AnythingOfType("*gin.Context"),
+			mock.AnythingOfType("*context.emptyCtx"),
 			user,
 		).Return(nil)
 		mockTokenService.On(
 			"NewPairFromUser",
-			mock.AnythingOfType("*gin.Context"),
+			mock.AnythingOfType("*context.emptyCtx"),
 			user,
 			"",
 		).Return(mockTokenResponce, nil)
@@ -256,12 +256,12 @@ func TestSignup(test *testing.T) {
 
 		mockUserService.On(
 			"Signup",
-			mock.AnythingOfType("*gin.Context"),
+			mock.AnythingOfType("*context.emptyCtx"),
 			user,
 		).Return(nil)
 		mockTokenService.On(
 			"NewPairFromUser",
-			mock.AnythingOfType("*gin.Context"),
+			mock.AnythingOfType("*context.emptyCtx"),
 			user,
 			"",
 		).Return(nil, mockErrorResponse)
