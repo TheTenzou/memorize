@@ -15,9 +15,9 @@ type TokenCustomClaims struct {
 	jwt.StandardClaims
 }
 
-func generateToken(user *models.User, key *rsa.PrivateKey) (string, error) {
+func generateToken(user *models.User, key *rsa.PrivateKey, expiration int64) (string, error) {
 	unixTime := time.Now().Unix()
-	tokenExpire := unixTime + 60*15
+	tokenExpire := unixTime + expiration
 
 	claims := TokenCustomClaims{
 		User: user,
@@ -49,9 +49,9 @@ type RefreshTokenCustomClaims struct {
 	jwt.StandardClaims
 }
 
-func generateRefreshToken(uid uuid.UUID, key string) (*RefreshToken, error) {
+func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*RefreshToken, error) {
 	currentTime := time.Now()
-	tokenExp := currentTime.AddDate(0, 0, 3) // 3 days
+	tokenExp := currentTime.Add(time.Duration(expiration) * time.Second)
 	tokenID, err := uuid.NewRandom()
 
 	if err != nil {

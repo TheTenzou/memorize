@@ -13,6 +13,8 @@ import (
 )
 
 func TestNewPairFromUser(test *testing.T) {
+	var tokenExpiration int64 = 15 * 60
+	var refreshTokenExpiration int64 = 3 * 24 * 2600
 	privateRSA, _ := ioutil.ReadFile("../rsa_private_test.pem")
 	privateKey, _ := jwt.ParseRSAPrivateKeyFromPEM(privateRSA)
 	publicRSA, _ := ioutil.ReadFile("../rsa_public_test.pem")
@@ -20,9 +22,11 @@ func TestNewPairFromUser(test *testing.T) {
 	secret := "verysecretsecret"
 
 	tokenService := NewTokenService(&TokenServiceConfig{
-		PrivateKey:    privateKey,
-		PublicKey:     publicKey,
-		RefreshSecret: secret,
+		PrivateKey:                privateKey,
+		PublicKey:                 publicKey,
+		RefreshSecret:             secret,
+		TokenExpirationSec:        tokenExpiration,
+		RefreshTokenExpirationSec: refreshTokenExpiration,
 	})
 
 	uid, _ := uuid.NewRandom()
@@ -71,7 +75,7 @@ func TestNewPairFromUser(test *testing.T) {
 		assert.Empty(test, idTokenClaims.User.Password)
 
 		expiresAt := time.Unix(idTokenClaims.StandardClaims.ExpiresAt, 0)
-		expectedExpiresAt := time.Now().Add(15 * time.Minute)
+		expectedExpiresAt := time.Now().Add(time.Duration(tokenExpiration) * time.Minute)
 		assert.WithinDuration(test, expectedExpiresAt, expiresAt, 5*time.Second)
 
 		refreshTokenClaims := &RefreshTokenCustomClaims{}
@@ -89,7 +93,7 @@ func TestNewPairFromUser(test *testing.T) {
 		assert.Equal(test, user.UID, refreshTokenClaims.UID)
 
 		expiresAt = time.Unix(refreshTokenClaims.StandardClaims.ExpiresAt, 0)
-		expectedExpiresAt = time.Now().Add(3 * 24 * time.Hour)
+		expectedExpiresAt = time.Now().Add(time.Duration(refreshTokenExpiration) * time.Hour)
 		assert.WithinDuration(test, expectedExpiresAt, expiresAt, 5*time.Second)
 	})
 }

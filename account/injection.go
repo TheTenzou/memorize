@@ -8,6 +8,7 @@ import (
 	"memorize/repository"
 	"memorize/services"
 	"os"
+	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -49,11 +50,25 @@ func inject(sources *dataSources) (*gin.Engine, error) {
 	}
 
 	refreshSecret := os.Getenv("REFRESH_SECRET")
+	tokenExpiration := os.Getenv("TOKEN_EXP")
+	refreshTokenExpiration := os.Getenv("REFRESH_TOKEN_EXP")
+
+	tokenExpirationSec, err := strconv.ParseInt(tokenExpiration, 0, 64)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse TOKEN_EXP as int: %v", err)
+	}
+
+	refreshTokenExpirationSec, err := strconv.ParseInt(refreshTokenExpiration, 0, 64)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse REFRESH_TOKEN_EXP as int: %v", err)
+	}
 
 	tokenService := services.NewTokenService(&services.TokenServiceConfig{
-		PrivateKey:    privateKey,
-		PublicKey:     publicKey,
-		RefreshSecret: refreshSecret,
+		PrivateKey:                privateKey,
+		PublicKey:                 publicKey,
+		RefreshSecret:             refreshSecret,
+		TokenExpirationSec:        tokenExpirationSec,
+		RefreshTokenExpirationSec: refreshTokenExpirationSec,
 	})
 
 	router := gin.Default()
