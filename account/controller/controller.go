@@ -13,6 +13,7 @@ type controller struct {
 	TokenService models.TokenService
 }
 
+// hold services that will eventually be injected into this handler layer on handler initialization
 type Config struct {
 	Router       *gin.Engine
 	UserService  models.UserService
@@ -20,6 +21,7 @@ type Config struct {
 	BaseURL      string
 }
 
+// initializes the handler with required injected services along with http routes
 func NewController(config *Config) {
 
 	ctrl := &controller{

@@ -31,7 +31,7 @@ func TestGet(test *testing.T) {
 		mockUserRepository.On("FindByID", mock.Anything, uid).Return(mockUserResponce, nil)
 
 		ctx := context.TODO()
-		user, err := userService.Get(ctx, uid)
+		user, err := userService.GetUser(ctx, uid)
 
 		assert.NoError(test, err)
 		assert.Equal(test, user, mockUserResponce)
@@ -50,7 +50,7 @@ func TestGet(test *testing.T) {
 
 		ctx := context.TODO()
 
-		user, err := userService.Get(ctx, uid)
+		user, err := userService.GetUser(ctx, uid)
 
 		assert.Nil(test, user)
 		assert.Error(test, err)

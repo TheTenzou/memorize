@@ -17,6 +17,7 @@ type tokenService struct {
 	RefreshTokenExpirationSec int64
 }
 
+// parameter for creating token service
 type TokenServiceConfig struct {
 	TokenRepository           models.TokenRepository
 	PrivateKey                *rsa.PrivateKey
@@ -26,6 +27,7 @@ type TokenServiceConfig struct {
 	RefreshTokenExpirationSec int64
 }
 
+// function for initializing a UserService with its repository layer dependencie
 func NewTokenService(config *TokenServiceConfig) models.TokenService {
 	return &tokenService{
 		TokenRepository:           config.TokenRepository,
@@ -37,6 +39,8 @@ func NewTokenService(config *TokenServiceConfig) models.TokenService {
 	}
 }
 
+// create new pair of tokens
+// if previous token included, the previous token is removed
 func (service *tokenService) NewPairFromUser(
 	ctx context.Context,
 	user *models.User,

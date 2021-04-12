@@ -13,22 +13,26 @@ type userService struct {
 	UserRespository models.UserRepository
 }
 
+// config hold repositories that will eventually be injected into this this service layer
 type UserServiceConfig struct {
 	UserRepository models.UserRepository
 }
 
+// factory function for initializing a UserService with its repository layer dependencies
 func NewUserService(c *UserServiceConfig) models.UserService {
 	return &userService{
 		UserRespository: c.UserRepository,
 	}
 }
 
-func (u *userService) Get(ctx context.Context, uid uuid.UUID) (*models.User, error) {
+// fetch user by uid
+func (u *userService) GetUser(ctx context.Context, uid uuid.UUID) (*models.User, error) {
 	user, err := u.UserRespository.FindByID(ctx, uid)
 
 	return user, err
 }
 
+// signup user if login avaliable
 func (u *userService) Signup(ctx context.Context, user *models.User) error {
 	password, err := hashPassword(user.Password)
 

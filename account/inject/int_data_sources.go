@@ -10,11 +10,13 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// structure for data sources
 type DataSources struct {
 	DB          *sqlx.DB
 	RedisClient *redis.Client
 }
 
+// Connecting to data sources
 func InitDataSources() (*DataSources, error) {
 
 	database, err := initPostgres()

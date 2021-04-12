@@ -33,9 +33,12 @@ func main() {
 		Handler: router,
 	}
 
+	log.Println("Server started.")
+
 	gracefullyShutdown(dataSources, server)
 }
 
+// Shutdown server and close connection
 func gracefullyShutdown(dataSources *inject.DataSources, server *http.Server) {
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

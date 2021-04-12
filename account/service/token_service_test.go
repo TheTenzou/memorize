@@ -16,6 +16,7 @@ import (
 )
 
 func TestNewPairFromUser(test *testing.T) {
+	// init params for token service
 	var tokenExpiration int64 = 15 * 60
 	var refreshTokenExpiration int64 = 3 * 24 * 60 * 60
 
@@ -27,6 +28,7 @@ func TestNewPairFromUser(test *testing.T) {
 
 	mockTokenRepository := new(mocks.MockTokenRepository)
 
+	// instance of tested service
 	tokenService := NewTokenService(&TokenServiceConfig{
 		TokenRepository:           mockTokenRepository,
 		PrivateKey:                privateKey,
@@ -36,6 +38,7 @@ func TestNewPairFromUser(test *testing.T) {
 		RefreshTokenExpirationSec: refreshTokenExpiration,
 	})
 
+	// init users
 	uid, _ := uuid.NewRandom()
 	user := &models.User{
 		UID:      uid,
@@ -51,6 +54,7 @@ func TestNewPairFromUser(test *testing.T) {
 	}
 	previousID := "a_previous_tokenID"
 
+	// Setup mock call responses in setup before test.Run statements
 	setSuccessArguments := mock.Arguments{
 		mock.AnythingOfType("*context.emptyCtx"),
 		user.UID.String(),
@@ -88,6 +92,7 @@ func TestNewPairFromUser(test *testing.T) {
 
 		idTokenClaims := &TokenCustomClaims{}
 
+		// parse token claims
 		_, err = jwt.ParseWithClaims(
 			tokenPair.IDToken,
 			idTokenClaims,
@@ -120,6 +125,7 @@ func TestNewPairFromUser(test *testing.T) {
 		expectedExpiresAt := time.Now().Add(time.Duration(tokenExpiration) * time.Second)
 		assert.WithinDuration(test, expectedExpiresAt, expiresAt, 5*time.Second)
 
+		// parse refresh token
 		refreshTokenClaims := &RefreshTokenCustomClaims{}
 		_, err = jwt.ParseWithClaims(
 			tokenPair.RefreshToken,

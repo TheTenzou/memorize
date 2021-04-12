@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Init router, inject servisec into controller
 func InitRouter(services *Services) *gin.Engine {
 
 	router := gin.Default()

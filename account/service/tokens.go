@@ -10,11 +10,13 @@ import (
 	"github.com/google/uuid"
 )
 
+// token claims
 type TokenCustomClaims struct {
 	User *models.User `json:"user"`
 	jwt.StandardClaims
 }
 
+// generateIDToken generates an IDToken which is a jwt with myCustomClaims
 func generateToken(user *models.User, key *rsa.PrivateKey, expiration int64) (string, error) {
 	unixTime := time.Now().Unix()
 	tokenExpire := unixTime + expiration
@@ -38,6 +40,8 @@ func generateToken(user *models.User, key *rsa.PrivateKey, expiration int64) (st
 	return signedToken, nil
 }
 
+// RefreshToken holds the actual signed jwt string along with the ID
+// We return the id so it can be used without re-parsing the JWT from signed string
 type RefreshToken struct {
 	SignedToken string
 	ID          string
@@ -49,6 +53,8 @@ type RefreshTokenCustomClaims struct {
 	jwt.StandardClaims
 }
 
+// generateRefreshToken creates a refresh token
+// The refresh token stores only the user's ID, a string
 func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*RefreshToken, error) {
 	currentTime := time.Now()
 	tokenExp := currentTime.Add(time.Duration(expiration) * time.Second)

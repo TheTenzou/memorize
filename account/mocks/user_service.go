@@ -12,7 +12,7 @@ type MockUserService struct {
 	mock.Mock
 }
 
-func (m *MockUserService) Get(ctx context.Context, uid uuid.UUID) (*models.User, error) {
+func (m *MockUserService) GetUser(ctx context.Context, uid uuid.UUID) (*models.User, error) {
 	args := m.Called(ctx, uid)
 
 	var r0 *models.User

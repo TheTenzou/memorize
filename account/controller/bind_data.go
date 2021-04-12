@@ -16,6 +16,8 @@ type invalidArgument struct {
 	Param string `json:"param"`
 }
 
+// bindData return false if data is not bound
+// if not bound set response with error
 func bindData(c *gin.Context, request interface{}) bool {
 
 	if c.ContentType() != "application/json" {

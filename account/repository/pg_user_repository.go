@@ -15,17 +15,20 @@ type pgUserRepository struct {
 	DB *sqlx.DB
 }
 
+// factory for initializing user repository
 func NewUserRepository(db *sqlx.DB) models.UserRepository {
 	return &pgUserRepository{
 		DB: db,
 	}
 }
 
+// create user record in database
 func (repository *pgUserRepository) Create(ctx context.Context, user *models.User) error {
 	query := "INSERT INTO users (login, password) VALUES ($1, $2) RETURNING *"
 
 	if err := repository.DB.GetContext(ctx, user, query, user.Login, user.Password); err != nil {
 
+		// check unique constraint
 		if err, ok := err.(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 			log.Printf(
 				"Could not create a user with login: %v. Reason %v\n",
@@ -42,6 +45,7 @@ func (repository *pgUserRepository) Create(ctx context.Context, user *models.Use
 	return nil
 }
 
+// fetch user by id from database
 func (repository *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*models.User, error) {
 	user := &models.User{}
 

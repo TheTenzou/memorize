@@ -11,11 +11,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+// structure for services
 type Services struct {
 	UserService  models.UserService
 	TokenService models.TokenService
 }
 
+// Inject repositories into services
 func InitServices(repositories *Repositories) (*Services, error) {
 
 	userService := service.NewUserService(&service.UserServiceConfig{
