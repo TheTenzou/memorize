@@ -30,7 +30,7 @@ func TestMe(t *testing.T) {
 		}
 
 		mockUserService := new(mocks.MockUserService)
-		mockUserService.On("Get", mock.AnythingOfType("*context.emptyCtx"), uid).Return(mockUserResp, nil)
+		mockUserService.On("GetUser", mock.AnythingOfType("*context.emptyCtx"), uid).Return(mockUserResp, nil)
 
 		recorder := httptest.NewRecorder()
 
@@ -65,7 +65,7 @@ func TestMe(t *testing.T) {
 
 	t.Run("NoContextUser", func(t *testing.T) {
 		mockUserService := new(mocks.MockUserService)
-		mockUserService.On("Get", mock.Anything, mock.Anything).Return(nil, nil)
+		mockUserService.On("GetUser", mock.Anything, mock.Anything).Return(nil, nil)
 
 		recorder := httptest.NewRecorder()
 
@@ -81,13 +81,13 @@ func TestMe(t *testing.T) {
 		router.ServeHTTP(recorder, request)
 
 		assert.Equal(t, 500, recorder.Code)
-		mockUserService.AssertNotCalled(t, "Get", mock.Anything)
+		mockUserService.AssertNotCalled(t, "GetUser", mock.Anything)
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
 		uid, _ := uuid.NewRandom()
 		mockUserService := new(mocks.MockUserService)
-		mockUserService.On("Get", mock.Anything, uid).Return(nil, fmt.Errorf("Some error down call chain"))
+		mockUserService.On("GetUser", mock.Anything, uid).Return(nil, fmt.Errorf("Some error down call chain"))
 
 		recorder := httptest.NewRecorder()
 
