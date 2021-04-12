@@ -24,7 +24,7 @@ func NewUserRepository(db *sqlx.DB) models.UserRepository {
 func (repository *pgUserRepository) Create(ctx context.Context, user *models.User) error {
 	query := "INSERT INTO users (login, password) VALUES ($1, $2) RETURNING *"
 
-	if err := repository.DB.Get(user, query, user.Login, user.Password); err != nil {
+	if err := repository.DB.GetContext(ctx, user, query, user.Login, user.Password); err != nil {
 
 		if err, ok := err.(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 			log.Printf(
@@ -47,7 +47,7 @@ func (repository *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID)
 
 	query := "SELECT * FROM users WHERE uid=&1"
 
-	if err := repository.DB.Get(user, query, uid); err != nil {
+	if err := repository.DB.GetContext(ctx, user, query, uid); err != nil {
 		return user, apperrors.NewNotFound("uid", uid.String())
 	}
 
