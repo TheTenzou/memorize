@@ -49,7 +49,7 @@ func (repository *pgUserRepository) Create(ctx context.Context, user *models.Use
 func (repository *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*models.User, error) {
 	user := &models.User{}
 
-	query := "SELECT * FROM users WHERE uid=&1"
+	query := "SELECT * FROM users WHERE uid=$1"
 
 	if err := repository.DB.GetContext(ctx, user, query, uid); err != nil {
 		return user, apperrors.NewNotFound("uid", uid.String())
