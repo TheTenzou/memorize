@@ -11,6 +11,12 @@ Content-Type: application/json
 
 ###
 POST http://localhost/api/account/signin
+Content-Type: application/json
+
+{
+    "login": "alice",
+    "password": "alicePass"
+}
 
 ###
 POST http://localhost/api/account/signout
