@@ -6,6 +6,8 @@ import (
 	"log"
 	"memorize/models"
 	"memorize/models/apperrors"
+
+	"github.com/google/uuid"
 )
 
 type tokenService struct {
@@ -46,6 +48,15 @@ func (service *tokenService) NewPairFromUser(
 	user *models.User,
 	previousTokenID string,
 ) (*models.TokenPair, error) {
+
+	if previousTokenID != "" {
+		if err := service.TokenRepository.DeleteRefreshToken(ctx, user.UID.String(), previousTokenID); err != nil {
+			log.Printf("Cold not delete previous refresh token for uid: %v, tokne %v\n", user.UID.String(), previousTokenID)
+
+			return nil, err
+		}
+	}
+
 	accessToken, err := generateToken(user, service.PrivateKey, service.TokenExpirationSec)
 
 	if err != nil {
@@ -103,6 +114,26 @@ func (service *tokenService) ValidateAccessToken(tokenString string) (*models.Us
 	return claims.User, nil
 }
 
-func (servce *tokenService) ValidateRefreshToken(tokenString string) (*models.RefreshToken, error) {
-	panic("not implemented")
+// ValidateRefreshToken checks to make sure the JWT provided by a string is valid
+// and returns a RefreshToken if valid
+func (s *tokenService) ValidateRefreshToken(tokenString string) (*models.RefreshToken, error) {
+	claims, err := validateRefreshToken(tokenString, s.RefreshSecret)
+
+	if err != nil {
+		log.Printf("Unable to validate or parse refreshToken for token string: %s\n%v\n", tokenString, err)
+		return nil, apperrors.NewAuthorization("Unable to verify user from refresh token")
+	}
+
+	tokenUUID, err := uuid.Parse(claims.Id)
+
+	if err != nil {
+		log.Printf("Claims ID could not be parsed as UUID: %s\n%v\n", claims.Id, err)
+		return nil, apperrors.NewAuthorization("Unable to verify user from refresh token")
+	}
+
+	return &models.RefreshToken{
+		Token:  tokenString,
+		ID:     tokenUUID,
+		UserID: claims.UserID,
+	}, nil
 }

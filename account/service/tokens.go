@@ -50,7 +50,7 @@ type refreshTokenData struct {
 }
 
 type refreshTokenCustomClaims struct {
-	UID uuid.UUID `json:"uid"`
+	UserID uuid.UUID `json:"uid"`
 	jwt.StandardClaims
 }
 
@@ -67,7 +67,7 @@ func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*refresh
 	}
 
 	claims := refreshTokenCustomClaims{
-		UID: uid,
+		UserID: uid,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  currentTime.Unix(),
 			ExpiresAt: tokenExp.Unix(),
@@ -113,6 +113,30 @@ func validateAccessToken(tokenString string, key *rsa.PublicKey) (*idTokenCustom
 
 	if !ok {
 		return nil, fmt.Errorf("ID token valid but couldn't parse claims")
+	}
+
+	return claims, nil
+}
+
+// validateRefreshToken uses the secret key to validate a refresh token
+func validateRefreshToken(tokenString string, key string) (*refreshTokenCustomClaims, error) {
+	claims := &refreshTokenCustomClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(key), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, fmt.Errorf("refresh token is invalid")
+	}
+
+	claims, ok := token.Claims.(*refreshTokenCustomClaims)
+
+	if !ok {
+		return nil, fmt.Errorf("refresh token valid but couldn't parse claims")
 	}
 
 	return claims, nil

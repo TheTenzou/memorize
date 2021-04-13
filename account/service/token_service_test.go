@@ -138,7 +138,7 @@ func TestNewPairFromUser(test *testing.T) {
 		assert.IsType(test, s, tokenPair.RefreshToken.Token)
 
 		assert.NoError(test, err)
-		assert.Equal(test, user.UID, refreshTokenClaims.UID)
+		assert.Equal(test, user.UID, refreshTokenClaims.UserID)
 
 		expiresAt = time.Unix(refreshTokenClaims.StandardClaims.ExpiresAt, 0)
 		expectedExpiresAt = time.Now().Add(time.Duration(refreshTokenExpiration) * time.Second)
