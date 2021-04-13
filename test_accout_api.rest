@@ -1,5 +1,5 @@
 GET http://localhost/api/account/me
-Authorization: Bearer token
+Authorization: Bearer {replace me with accessToken}
 
 ###
 POST http://localhost/api/account/signup
@@ -24,6 +24,11 @@ POST http://localhost/api/account/signout
 
 ###
 POST http://localhost/api/account/tokens
+Content-Type: application/json
+
+{
+    "refreshToken": "{replace me with refreshToken"
+}
 
 ###
 POST http://localhost/api/account/image
