@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"log"
 	"memorize/models"
 	"time"
@@ -87,4 +88,32 @@ func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*Refresh
 		ID:          tokenID.String(),
 		ExpiresIn:   tokenExp.Sub(currentTime),
 	}, nil
+}
+
+// returns the token's claims if the token is valid
+func validateToken(tokenString string, key *rsa.PublicKey) (*TokenCustomClaims, error) {
+	claims := &TokenCustomClaims{}
+
+	token, err := jwt.ParseWithClaims(
+		tokenString, claims,
+		func(token *jwt.Token) (interface{}, error) {
+			return key, nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, fmt.Errorf("ID token is invalid")
+	}
+
+	claims, ok := token.Claims.(*TokenCustomClaims)
+
+	if !ok {
+		return nil, fmt.Errorf("ID token valid but couldn't parse claims")
+	}
+
+	return claims, nil
 }

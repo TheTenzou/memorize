@@ -83,3 +83,16 @@ func (service *tokenService) NewPairFromUser(
 		RefreshToken: refreshToken.SignedToken,
 	}, nil
 }
+
+// validates the id token jwt string
+// it returns the user extract from the IDTokenCustomClaims
+func (service *tokenService) ValidateToken(tokenString string) (*models.User, error) {
+	claims, err := validateToken(tokenString, service.PublicKey) // uses public RSA key
+
+	if err != nil {
+		log.Printf("Unable to validate or parse idToken - Error: %v\n", err)
+		return nil, apperrors.NewAuthorization("Unable to verify user from idToken")
+	}
+
+	return claims.User, nil
+}
