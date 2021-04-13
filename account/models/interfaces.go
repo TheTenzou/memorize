@@ -27,6 +27,8 @@ type TokenService interface {
 type UserRepository interface {
 	// fetch user by id from database
 	FindByID(context.Context, uuid.UUID) (*User, error)
+	// fetch user by login from database
+	FindByLogin(context.Context, string) (*User, error)
 	// create user record in database
 	Create(context.Context, *User) error
 }

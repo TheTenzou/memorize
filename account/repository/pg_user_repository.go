@@ -57,3 +57,16 @@ func (repository *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID)
 
 	return user, nil
 }
+
+func (repository *pgUserRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
+	user := &models.User{}
+
+	query := "SELECT * FROM users WHERE login=$1"
+
+	if err := repository.DB.GetContext(ctx, user, query, login); err != nil {
+		log.Printf("Unable to get user with login: %v. err %v\n", login, err)
+		return nil, apperrors.NewNotFound("login", login)
+	}
+
+	return user, nil
+}
