@@ -12,7 +12,7 @@ import (
 )
 
 // token claims
-type TokenCustomClaims struct {
+type idTokenCustomClaims struct {
 	User *models.User `json:"user"`
 	jwt.StandardClaims
 }
@@ -22,7 +22,7 @@ func generateToken(user *models.User, key *rsa.PrivateKey, expiration int64) (st
 	unixTime := time.Now().Unix()
 	tokenExpire := unixTime + expiration
 
-	claims := TokenCustomClaims{
+	claims := idTokenCustomClaims{
 		User: user,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  unixTime,
@@ -41,22 +41,22 @@ func generateToken(user *models.User, key *rsa.PrivateKey, expiration int64) (st
 	return signedToken, nil
 }
 
-// RefreshToken holds the actual signed jwt string along with the ID
+// refreshTokenData holds the actual signed jwt string along with the ID
 // We return the id so it can be used without re-parsing the JWT from signed string
-type RefreshToken struct {
+type refreshTokenData struct {
 	SignedToken string
-	ID          string
+	ID          uuid.UUID
 	ExpiresIn   time.Duration
 }
 
-type RefreshTokenCustomClaims struct {
+type refreshTokenCustomClaims struct {
 	UID uuid.UUID `json:"uid"`
 	jwt.StandardClaims
 }
 
 // generateRefreshToken creates a refresh token
 // The refresh token stores only the user's ID, a string
-func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*RefreshToken, error) {
+func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*refreshTokenData, error) {
 	currentTime := time.Now()
 	tokenExp := currentTime.Add(time.Duration(expiration) * time.Second)
 	tokenID, err := uuid.NewRandom()
@@ -66,7 +66,7 @@ func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*Refresh
 		return nil, err
 	}
 
-	claims := RefreshTokenCustomClaims{
+	claims := refreshTokenCustomClaims{
 		UID: uid,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  currentTime.Unix(),
@@ -83,16 +83,16 @@ func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*Refresh
 		return nil, err
 	}
 
-	return &RefreshToken{
+	return &refreshTokenData{
 		SignedToken: signedToken,
-		ID:          tokenID.String(),
+		ID:          tokenID,
 		ExpiresIn:   tokenExp.Sub(currentTime),
 	}, nil
 }
 
 // returns the token's claims if the token is valid
-func validateToken(tokenString string, key *rsa.PublicKey) (*TokenCustomClaims, error) {
-	claims := &TokenCustomClaims{}
+func validateToken(tokenString string, key *rsa.PublicKey) (*idTokenCustomClaims, error) {
+	claims := &idTokenCustomClaims{}
 
 	token, err := jwt.ParseWithClaims(
 		tokenString, claims,
@@ -109,7 +109,7 @@ func validateToken(tokenString string, key *rsa.PublicKey) (*TokenCustomClaims, 
 		return nil, fmt.Errorf("ID token is invalid")
 	}
 
-	claims, ok := token.Claims.(*TokenCustomClaims)
+	claims, ok := token.Claims.(*idTokenCustomClaims)
 
 	if !ok {
 		return nil, fmt.Errorf("ID token valid but couldn't parse claims")

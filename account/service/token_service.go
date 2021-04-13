@@ -46,7 +46,7 @@ func (service *tokenService) NewPairFromUser(
 	user *models.User,
 	previousTokenID string,
 ) (*models.TokenPair, error) {
-	idToken, err := generateToken(user, service.PrivateKey, service.TokenExpirationSec)
+	accessToken, err := generateToken(user, service.PrivateKey, service.TokenExpirationSec)
 
 	if err != nil {
 		log.Printf("Error generating idToken for uid: %v, Error: %v\n", user.UID, err.Error())
@@ -61,7 +61,7 @@ func (service *tokenService) NewPairFromUser(
 
 	if err := service.TokenRepository.SetRefreshToken(
 		ctx, user.UID.String(),
-		refreshToken.ID,
+		refreshToken.ID.String(),
 		refreshToken.ExpiresIn,
 	); err != nil {
 		log.Printf("Error storing tokenID for uid: %v. Error: %v\n", user.UID, err.Error())
@@ -79,8 +79,14 @@ func (service *tokenService) NewPairFromUser(
 	}
 
 	return &models.TokenPair{
-		IDToken:      idToken,
-		RefreshToken: refreshToken.SignedToken,
+		AccessToken: models.AccessToken{
+			Token: accessToken,
+		},
+		RefreshToken: models.RefreshToken{
+			ID:     refreshToken.ID,
+			UserID: user.UID,
+			Token:  refreshToken.SignedToken,
+		},
 	}, nil
 }
 
