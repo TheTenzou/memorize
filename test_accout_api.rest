@@ -1,4 +1,5 @@
 GET http://localhost/api/account/me
+Authorization: Bearer token
 
 ###
 POST http://localhost/api/account/signup

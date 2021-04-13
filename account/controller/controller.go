@@ -37,9 +37,11 @@ func NewController(config *Config) {
 
 	if gin.Mode() != gin.TestMode {
 		group.Use(middleware.Timeout(config.TImeoutDuration, apperrors.NewServiceUnavailable()))
+		group.GET("/me", middleware.AuthUser(ctrl.TokenService), ctrl.Me)
+	} else {
+		group.GET("/me", ctrl.Me)
 	}
 
-	group.GET("/me", ctrl.Me)
 	group.POST("/signup", ctrl.Signup)
 	group.POST("/signin", ctrl.Signin)
 	group.POST("/signout", ctrl.Signout)
