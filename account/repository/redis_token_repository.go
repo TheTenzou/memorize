@@ -42,10 +42,18 @@ func (repository *redisTokenRepository) SetRefreshToken(
 // delete old refresh tokens
 func (repository *redisTokenRepository) DeleteRefreshToken(ctx context.Context, userID string, tokenID string) error {
 
-	key := fmt.Sprintf("%s:%s", userID, tokenID)
-	if err := repository.Redis.Del(ctx, key).Err(); err != nil {
+	key := fmt.Sprintf("%s.%s", userID, tokenID)
+
+	result := repository.Redis.Del(ctx, key)
+
+	if err := result.Err(); err != nil {
 		log.Printf("Could not delete refresh token to redis for userID/tokenID: %s/%s: %v\n", userID, tokenID, err)
 		return apperrors.NewInternal()
+	}
+
+	if result.Val() < 1 {
+		log.Printf("Refresh token to redis for userID/tokenID %s/%s doesnot exist\n", userID, tokenID)
+		return apperrors.NewAuthorization("Invalid refresh token")
 	}
 
 	return nil
