@@ -22,7 +22,9 @@ type TokenService interface {
 	// create new pair of tokens
 	NewPairFromUser(context.Context, *User, string) (*TokenPair, error)
 	// validate token
-	ValidateToken(string) (*User, error)
+	ValidateAccessToken(string) (*User, error)
+	// validate refresh token
+	ValidateRefreshToken(string) (*RefreshToken, error)
 }
 
 // UserRepository defines methods the service layer expects

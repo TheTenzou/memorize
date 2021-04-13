@@ -92,8 +92,8 @@ func (service *tokenService) NewPairFromUser(
 
 // validates the id token jwt string
 // it returns the user extract from the IDTokenCustomClaims
-func (service *tokenService) ValidateToken(tokenString string) (*models.User, error) {
-	claims, err := validateToken(tokenString, service.PublicKey) // uses public RSA key
+func (service *tokenService) ValidateAccessToken(tokenString string) (*models.User, error) {
+	claims, err := validateAccessToken(tokenString, service.PublicKey) // uses public RSA key
 
 	if err != nil {
 		log.Printf("Unable to validate or parse idToken - Error: %v\n", err)
@@ -101,4 +101,8 @@ func (service *tokenService) ValidateToken(tokenString string) (*models.User, er
 	}
 
 	return claims.User, nil
+}
+
+func (servce *tokenService) ValidateRefreshToken(tokenString string) (*models.RefreshToken, error) {
+	panic("not implemented")
 }

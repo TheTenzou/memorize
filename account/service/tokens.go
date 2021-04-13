@@ -91,7 +91,7 @@ func generateRefreshToken(uid uuid.UUID, key string, expiration int64) (*refresh
 }
 
 // returns the token's claims if the token is valid
-func validateToken(tokenString string, key *rsa.PublicKey) (*idTokenCustomClaims, error) {
+func validateAccessToken(tokenString string, key *rsa.PublicKey) (*idTokenCustomClaims, error) {
 	claims := &idTokenCustomClaims{}
 
 	token, err := jwt.ParseWithClaims(

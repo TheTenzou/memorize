@@ -29,8 +29,8 @@ func TestAuthUser(test *testing.T) {
 	invalidTokenHeader := "invalidTokenString"
 	invalidTokenErr := apperrors.NewAuthorization("Unable to verify user from idToken")
 
-	mockTokenService.On("ValidateToken", validTokenHeader).Return(user, nil)
-	mockTokenService.On("ValidateToken", invalidTokenHeader).Return(nil, invalidTokenErr)
+	mockTokenService.On("ValidateAccessToken", validTokenHeader).Return(user, nil)
+	mockTokenService.On("ValidateAccessToken", invalidTokenHeader).Return(nil, invalidTokenErr)
 
 	test.Run("Adds a user to context", func(test *testing.T) {
 		recorder := httptest.NewRecorder()
@@ -52,7 +52,7 @@ func TestAuthUser(test *testing.T) {
 		assert.Equal(test, http.StatusOK, recorder.Code)
 		assert.Equal(test, user, contextUser)
 
-		mockTokenService.AssertCalled(test, "ValidateToken", validTokenHeader)
+		mockTokenService.AssertCalled(test, "ValidateAccessToken", validTokenHeader)
 	})
 
 	test.Run("Invalid Token", func(test *testing.T) {
@@ -68,7 +68,7 @@ func TestAuthUser(test *testing.T) {
 		router.ServeHTTP(recorder, request)
 
 		assert.Equal(test, http.StatusUnauthorized, recorder.Code)
-		mockTokenService.AssertCalled(test, "ValidateToken", invalidTokenHeader)
+		mockTokenService.AssertCalled(test, "ValidateAccessToken", invalidTokenHeader)
 	})
 
 	test.Run("Missing Authorization Header", func(test *testing.T) {
@@ -83,6 +83,6 @@ func TestAuthUser(test *testing.T) {
 		router.ServeHTTP(recorder, request)
 
 		assert.Equal(test, http.StatusUnauthorized, recorder.Code)
-		mockTokenService.AssertNotCalled(test, "ValidateToken")
+		mockTokenService.AssertNotCalled(test, "ValidateAccessToken")
 	})
 }
