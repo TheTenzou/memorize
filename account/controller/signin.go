@@ -16,7 +16,7 @@ type signinReq struct {
 }
 
 // Signin used to authenticate extant user
-func (h *controller) Signin(ginContext *gin.Context) {
+func (c *controller) Signin(ginContext *gin.Context) {
 	var req signinReq
 
 	if ok := bindData(ginContext, &req); !ok {
@@ -29,7 +29,7 @@ func (h *controller) Signin(ginContext *gin.Context) {
 	}
 
 	ctx := ginContext.Request.Context()
-	err := h.UserService.Signin(ctx, user)
+	_, err := c.UserService.Signin(ctx, user)
 
 	if err != nil {
 		log.Printf("Failed to sign in user: %v\n", err.Error())
@@ -39,7 +39,7 @@ func (h *controller) Signin(ginContext *gin.Context) {
 		return
 	}
 
-	tokens, err := h.TokenService.NewPairFromUser(ctx, user, "")
+	tokens, err := c.TokenService.NewPairFromUser(ctx, user, "")
 
 	if err != nil {
 		log.Printf("Failed to create tokens for user: %v\n", err.Error())

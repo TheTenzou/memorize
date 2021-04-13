@@ -40,13 +40,18 @@ func (m *MockUserService) Signup(ctx context.Context, user *models.User) error {
 	return r0
 }
 
-func (m *MockUserService) Signin(ctx context.Context, user *models.User) error {
+func (m *MockUserService) Signin(ctx context.Context, user *models.User) (*models.User, error) {
 	args := m.Called(ctx, user)
 
-	var r0 error
+	var r0 *models.User
 	if args.Get(0) != nil {
-		r0 = args.Get(0).(error)
+		r0 = args.Get(0).(*models.User)
 	}
 
-	return r0
+	var r1 error
+	if args.Get(1) != nil {
+		r1 = args.Get(1).(error)
+	}
+
+	return r0, r1
 }

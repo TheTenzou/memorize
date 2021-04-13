@@ -34,7 +34,7 @@ func (u *userService) GetUser(ctx context.Context, uid uuid.UUID) (*models.User,
 
 // signup user if login avaliable
 func (u *userService) Signup(ctx context.Context, user *models.User) error {
-	password, err := hashPassword(user.Password)
+	password, err := HashPassword(user.Password)
 
 	if err != nil {
 		log.Printf("Unable to signup user for login: %v\n", user.Login)
@@ -50,25 +50,24 @@ func (u *userService) Signup(ctx context.Context, user *models.User) error {
 	return nil
 }
 
-func (u *userService) Signin(ctx context.Context, user *models.User) error {
+func (u *userService) Signin(ctx context.Context, user *models.User) (*models.User, error) {
 	fetchedUser, err := u.UserRespository.FindByLogin(ctx, user.Login)
 
 	// Will return NotAuthorized to client to omit details of why
 	if err != nil {
-		return apperrors.NewAuthorization("User with this login dont exist")
+		return nil, apperrors.NewAuthorization("User with this login dont exist")
 	}
 
 	// verify password
 	match, err := comparePasswords(fetchedUser.Password, user.Password)
 
 	if err != nil {
-		return apperrors.NewInternal()
+		return nil, apperrors.NewInternal()
 	}
 
 	if !match {
-		return apperrors.NewAuthorization("Invalid login and password combination")
+		return nil, apperrors.NewAuthorization("Invalid login and password combination")
 	}
 
-	user = fetchedUser
-	return nil
+	return fetchedUser, nil
 }

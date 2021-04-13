@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-func hashPassword(password string) (string, error) {
+func HashPassword(password string) (string, error) {
 	salt := make([]byte, 32)
 
 	_, err := rand.Read(salt)

@@ -129,12 +129,12 @@ func TestSignup(test *testing.T) {
 
 func TestSignin(test *testing.T) {
 	login := "login"
-	validPW := "testPasswrod"
-	hashedValidPW, _ := hashPassword(validPW)
-	invalidPW := "invalid"
+	validPassword := "testPasswrod"
+	hashedValidPassword, _ := HashPassword(validPassword)
+	invalidPasswrod := "invalid"
 
 	mockUserRepository := new(mocks.MockUserRepository)
-	us := NewUserService(&UserServiceConfig{
+	userService := NewUserService(&UserServiceConfig{
 		UserRepository: mockUserRepository,
 	})
 
@@ -143,13 +143,13 @@ func TestSignin(test *testing.T) {
 
 		mockUser := &models.User{
 			Login:    login,
-			Password: validPW,
+			Password: validPassword,
 		}
 
 		mockUserResponse := &models.User{
 			UID:      uid,
 			Login:    login,
-			Password: hashedValidPW,
+			Password: hashedValidPassword,
 		}
 
 		mockArgs := mock.Arguments{
@@ -161,7 +161,8 @@ func TestSignin(test *testing.T) {
 			On("FindByLogin", mockArgs...).Return(mockUserResponse, nil)
 
 		ctx := context.TODO()
-		err := us.Signin(ctx, mockUser)
+		loginUser, err := userService.Signin(ctx, mockUser)
+		assert.Equal(test, mockUserResponse, loginUser)
 
 		assert.NoError(test, err)
 		mockUserRepository.AssertCalled(test, "FindByLogin", mockArgs...)
@@ -172,13 +173,13 @@ func TestSignin(test *testing.T) {
 
 		mockUser := &models.User{
 			Login:    login,
-			Password: invalidPW,
+			Password: invalidPasswrod,
 		}
 
 		mockUserResponse := &models.User{
 			UID:      uid,
 			Login:    login,
-			Password: hashedValidPW,
+			Password: hashedValidPassword,
 		}
 
 		mockArgs := mock.Arguments{
@@ -190,7 +191,8 @@ func TestSignin(test *testing.T) {
 			On("FindByLogin", mockArgs...).Return(mockUserResponse, nil)
 
 		ctx := context.TODO()
-		err := us.Signin(ctx, mockUser)
+		loginUser, err := userService.Signin(ctx, mockUser)
+		assert.Nil(test, loginUser)
 
 		assert.Error(test, err)
 		assert.EqualError(test, err, "Invalid login and password combination")

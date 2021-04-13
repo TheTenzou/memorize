@@ -14,7 +14,7 @@ type UserService interface {
 	// signup user if login avaliable
 	Signup(context.Context, *User) error
 	// signin user if credentials are right
-	Signin(context.Context, *User) error
+	Signin(context.Context, *User) (*User, error)
 }
 
 // TokenService defines methods the handler layer expects
