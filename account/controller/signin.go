@@ -29,7 +29,7 @@ func (c *controller) Signin(ginContext *gin.Context) {
 	}
 
 	ctx := ginContext.Request.Context()
-	_, err := c.UserService.Signin(ctx, user)
+	signupedUser, err := c.UserService.Signin(ctx, user)
 
 	if err != nil {
 		log.Printf("Failed to sign in user: %v\n", err.Error())
@@ -39,7 +39,7 @@ func (c *controller) Signin(ginContext *gin.Context) {
 		return
 	}
 
-	tokens, err := c.TokenService.NewPairFromUser(ctx, user, "")
+	tokens, err := c.TokenService.NewPairFromUser(ctx, signupedUser, "")
 
 	if err != nil {
 		log.Printf("Failed to create tokens for user: %v\n", err.Error())

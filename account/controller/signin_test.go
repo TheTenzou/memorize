@@ -113,10 +113,7 @@ func TestSignin(test *testing.T) {
 
 		mockTSArgs := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
-			&models.User{
-				Login:    login,
-				Password: password,
-			},
+			mockUser,
 			"",
 		}
 
@@ -177,10 +174,7 @@ func TestSignin(test *testing.T) {
 
 		mockTSArgs := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
-			&models.User{
-				Login:    login,
-				Password: password,
-			},
+			mockUser,
 			"",
 		}
 
