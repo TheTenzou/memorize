@@ -51,5 +51,24 @@ func (u *userService) Signup(ctx context.Context, user *models.User) error {
 }
 
 func (u *userService) Signin(ctx context.Context, user *models.User) error {
-	panic("Not implemented")
+	fetchedUser, err := u.UserRespository.FindByLogin(ctx, user.Login)
+
+	// Will return NotAuthorized to client to omit details of why
+	if err != nil {
+		return apperrors.NewAuthorization("User with this login dont exist")
+	}
+
+	// verify password
+	match, err := comparePasswords(fetchedUser.Password, user.Password)
+
+	if err != nil {
+		return apperrors.NewInternal()
+	}
+
+	if !match {
+		return apperrors.NewAuthorization("Invalid login and password combination")
+	}
+
+	user = fetchedUser
+	return nil
 }

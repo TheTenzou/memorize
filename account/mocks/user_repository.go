@@ -28,6 +28,22 @@ func (m *MockUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*mode
 	return r0, r1
 }
 
+func (m *MockUserRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
+	args := m.Called(ctx, login)
+
+	var r0 *models.User
+	if args.Get(0) != nil {
+		r0 = args.Get(0).(*models.User)
+	}
+
+	var r1 error
+	if args.Get(1) != nil {
+		r1 = args.Get(1).(error)
+	}
+
+	return r0, r1
+}
+
 func (m *MockUserRepository) Create(ctx context.Context, user *models.User) error {
 	args := m.Called(ctx, user)
 

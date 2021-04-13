@@ -126,3 +126,74 @@ func TestSignup(test *testing.T) {
 		mockUserRepository.AssertExpectations(test)
 	})
 }
+
+func TestSignin(test *testing.T) {
+	login := "login"
+	validPW := "testPasswrod"
+	hashedValidPW, _ := hashPassword(validPW)
+	invalidPW := "invalid"
+
+	mockUserRepository := new(mocks.MockUserRepository)
+	us := NewUserService(&UserServiceConfig{
+		UserRepository: mockUserRepository,
+	})
+
+	test.Run("Success", func(test *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &models.User{
+			Login:    login,
+			Password: validPW,
+		}
+
+		mockUserResponse := &models.User{
+			UID:      uid,
+			Login:    login,
+			Password: hashedValidPW,
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			login,
+		}
+
+		mockUserRepository.
+			On("FindByLogin", mockArgs...).Return(mockUserResponse, nil)
+
+		ctx := context.TODO()
+		err := us.Signin(ctx, mockUser)
+
+		assert.NoError(test, err)
+		mockUserRepository.AssertCalled(test, "FindByLogin", mockArgs...)
+	})
+
+	test.Run("Invalid login/password combination", func(test *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &models.User{
+			Login:    login,
+			Password: invalidPW,
+		}
+
+		mockUserResponse := &models.User{
+			UID:      uid,
+			Login:    login,
+			Password: hashedValidPW,
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			login,
+		}
+
+		mockUserRepository.
+			On("FindByLogin", mockArgs...).Return(mockUserResponse, nil)
+
+		ctx := context.TODO()
+		err := us.Signin(ctx, mockUser)
+
+		assert.Error(test, err)
+		assert.EqualError(test, err, "Invalid login and password combination")
+		mockUserRepository.AssertCalled(test, "FindByLogin", mockArgs...)
+	})
+}
