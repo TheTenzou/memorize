@@ -34,3 +34,15 @@ func (m *MockTokenRepository) DeleteRefreshToken(ctx context.Context, userID str
 
 	return r0
 }
+
+func (m *MockTokenRepository) DeleteUserRefreshTokens(ctx context.Context, userID string) error {
+	args := m.Called(ctx, userID)
+
+	var r0 error
+
+	if args.Get(0) != nil {
+		r0 = args.Get(0).(error)
+	}
+
+	return r0
+}

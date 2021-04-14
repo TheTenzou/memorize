@@ -23,7 +23,7 @@ func NewTokenRepository(redisClient *redis.Client) models.TokenRepository {
 }
 
 // stores a refresh token with an expiry time
-func (repository *redisTokenRepository) SetRefreshToken(
+func (r *redisTokenRepository) SetRefreshToken(
 	ctx context.Context,
 	userID string,
 	tokenID string,
@@ -31,7 +31,7 @@ func (repository *redisTokenRepository) SetRefreshToken(
 ) error {
 
 	key := fmt.Sprintf("%s.%s", userID, tokenID)
-	if err := repository.Redis.Set(ctx, key, 0, expiresIn).Err(); err != nil {
+	if err := r.Redis.Set(ctx, key, 0, expiresIn).Err(); err != nil {
 		log.Printf("Could not SET refresh token to redis for userID/tokenID: %s/%s: %v\n", userID, tokenID, err)
 		return apperrors.NewInternal()
 	}
@@ -40,11 +40,11 @@ func (repository *redisTokenRepository) SetRefreshToken(
 }
 
 // delete old refresh tokens
-func (repository *redisTokenRepository) DeleteRefreshToken(ctx context.Context, userID string, tokenID string) error {
+func (r *redisTokenRepository) DeleteRefreshToken(ctx context.Context, userID string, tokenID string) error {
 
 	key := fmt.Sprintf("%s.%s", userID, tokenID)
 
-	result := repository.Redis.Del(ctx, key)
+	result := r.Redis.Del(ctx, key)
 
 	if err := result.Err(); err != nil {
 		log.Printf("Could not delete refresh token to redis for userID/tokenID: %s/%s: %v\n", userID, tokenID, err)
@@ -54,6 +54,32 @@ func (repository *redisTokenRepository) DeleteRefreshToken(ctx context.Context, 
 	if result.Val() < 1 {
 		log.Printf("Refresh token to redis for userID/tokenID %s/%s doesnot exist\n", userID, tokenID)
 		return apperrors.NewAuthorization("Invalid refresh token")
+	}
+
+	return nil
+}
+
+// DeleteUserRefreshTokens delete all refresh tokens of specific user
+func (r *redisTokenRepository) DeleteUserRefreshTokens(ctx context.Context, userID string) error {
+	pattern := fmt.Sprintf("%s*", userID)
+
+	iter := r.Redis.Scan(ctx, 0, pattern, 5).Iterator()
+	failCount := 0
+
+	for iter.Next(ctx) {
+		if err := r.Redis.Del(ctx, iter.Val()).Err(); err != nil {
+			log.Printf("Failed to delete refresh token: %s\n", iter.Val())
+			failCount++
+		}
+	}
+
+	// check last value
+	if err := iter.Err(); err != nil {
+		log.Printf("Failed to delete refresh token: %s\n", iter.Val())
+	}
+
+	if failCount > 0 {
+		return apperrors.NewInternal()
 	}
 
 	return nil
