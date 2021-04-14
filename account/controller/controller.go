@@ -38,24 +38,18 @@ func NewController(config *Config) {
 	if gin.Mode() != gin.TestMode {
 		group.Use(middleware.Timeout(config.TImeoutDuration, apperrors.NewServiceUnavailable()))
 		group.GET("/me", middleware.AuthUser(ctrl.TokenService), ctrl.Me)
+		group.POST("/signout", middleware.AuthUser(ctrl.TokenService), ctrl.Signout)
 	} else {
 		group.GET("/me", ctrl.Me)
+		group.POST("/signout", ctrl.Signout)
 	}
 
 	group.POST("/signup", ctrl.Signup)
 	group.POST("/signin", ctrl.Signin)
-	group.POST("/signout", ctrl.Signout)
 	group.POST("/tokens", ctrl.Tokens)
 	group.POST("/image", ctrl.Image)
 	group.DELETE("/image", ctrl.DeleteImage)
 	group.PUT("/details", ctrl.Details)
-}
-
-func (c *controller) Signout(context *gin.Context) {
-	time.Sleep(2 * time.Second) // for testing
-	context.JSON(http.StatusOK, gin.H{
-		"hello": "it's signout",
-	})
 }
 
 func (c *controller) Image(context *gin.Context) {

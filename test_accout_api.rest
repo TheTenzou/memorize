@@ -1,5 +1,5 @@
 GET http://localhost/api/account/me
-Authorization: Bearer {replace me with accessToken}
+Authorization: Bearer replace_me_with_accessToken
 
 ###
 POST http://localhost/api/account/signup
@@ -21,13 +21,14 @@ Content-Type: application/json
 
 ###
 POST http://localhost/api/account/signout
+Authorization: Bearer replace_me_with_accessToken
 
 ###
 POST http://localhost/api/account/tokens
 Content-Type: application/json
 
 {
-    "refreshToken": "{replace me with refreshToken"
+    "refreshToken": "replace_me_with_refresh_token"
 }
 
 ###
