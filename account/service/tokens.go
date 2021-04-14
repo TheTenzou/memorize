@@ -17,7 +17,7 @@ type idTokenCustomClaims struct {
 	jwt.StandardClaims
 }
 
-// generateIDToken generates an IDToken which is a jwt with myCustomClaims
+// generateToken generates an IDToken which is a jwt with myCustomClaims
 func generateToken(user *models.User, key *rsa.PrivateKey, expiration int64) (string, error) {
 	unixTime := time.Now().Unix()
 	tokenExpire := unixTime + expiration
