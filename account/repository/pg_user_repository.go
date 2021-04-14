@@ -58,6 +58,7 @@ func (repository *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID)
 	return user, nil
 }
 
+// fetch user by login from databse
 func (repository *pgUserRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
 	user := &models.User{}
 
@@ -69,4 +70,29 @@ func (repository *pgUserRepository) FindByLogin(ctx context.Context, login strin
 	}
 
 	return user, nil
+}
+
+// Update updates a user's properties
+// TODO fix user mutation
+func (repository *pgUserRepository) Update(ctx context.Context, user *models.User) error {
+	query := `
+		UPDATE users 
+		SET name=:name, email=:email, website=:website
+		WHERE uid=:uid
+		RETURNING *;
+	`
+
+	preparedQuery, err := repository.DB.PrepareNamedContext(ctx, query)
+
+	if err != nil {
+		log.Printf("Unable to prepare user update query: %v\n", err)
+		return apperrors.NewInternal()
+	}
+
+	if err := preparedQuery.GetContext(ctx, user, user); err != nil {
+		log.Printf("Failed to update details for user: %v\n", user)
+		return apperrors.NewInternal()
+	}
+
+	return nil
 }

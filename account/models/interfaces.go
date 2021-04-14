@@ -15,6 +15,8 @@ type UserService interface {
 	Signup(ctx context.Context, user *User) error
 	// signin user if credentials are right
 	Signin(ctx context.Context, user *User) (*User, error)
+	// update user details
+	UpdateDetails(ctx context.Context, user *User) error
 }
 
 // TokenService defines methods the handler layer expects
@@ -37,6 +39,8 @@ type UserRepository interface {
 	FindByLogin(ctx context.Context, login string) (*User, error)
 	// create user record in database
 	Create(ctx context.Context, user *User) error
+	// update user record in database
+	Update(ctx context.Context, user *User) error
 }
 
 // TokenRepository defines methods it expects a repository

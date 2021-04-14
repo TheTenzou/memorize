@@ -54,3 +54,14 @@ func (m *MockUserRepository) Create(ctx context.Context, user *models.User) erro
 
 	return r0
 }
+
+func (m *MockUserRepository) Update(ctx context.Context, u *models.User) error {
+	args := m.Called(ctx, u)
+
+	var r0 error
+	if args.Get(0) != nil {
+		r0 = args.Get(0).(error)
+	}
+
+	return r0
+}
