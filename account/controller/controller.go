@@ -39,9 +39,11 @@ func NewController(config *Config) {
 		group.Use(middleware.Timeout(config.TImeoutDuration, apperrors.NewServiceUnavailable()))
 		group.GET("/me", middleware.AuthUser(ctrl.TokenService), ctrl.Me)
 		group.POST("/signout", middleware.AuthUser(ctrl.TokenService), ctrl.Signout)
+		group.PUT("/details", middleware.AuthUser(ctrl.TokenService), ctrl.Details)
 	} else {
 		group.GET("/me", ctrl.Me)
 		group.POST("/signout", ctrl.Signout)
+		group.PUT("/details", ctrl.Details)
 	}
 
 	group.POST("/signup", ctrl.Signup)
@@ -49,7 +51,6 @@ func NewController(config *Config) {
 	group.POST("/tokens", ctrl.Tokens)
 	group.POST("/image", ctrl.Image)
 	group.DELETE("/image", ctrl.DeleteImage)
-	group.PUT("/details", ctrl.Details)
 }
 
 func (c *controller) Image(context *gin.Context) {
@@ -61,11 +62,5 @@ func (c *controller) Image(context *gin.Context) {
 func (c *controller) DeleteImage(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"hello": "it's delete image",
-	})
-}
-
-func (c *controller) Details(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{
-		"cello": "it's details",
 	})
 }

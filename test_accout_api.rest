@@ -39,3 +39,11 @@ DELETE  http://localhost/api/account/image
 
 ###
 PUT  http://localhost/api/account/details
+Authorization: Bearer replace_me_with_accessToken
+Content-Type: application/json
+
+{
+    "name": "Alice",
+    "email": "alice@mail.com",
+    "website": "https://www.alice.com"
+}
