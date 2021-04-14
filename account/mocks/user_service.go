@@ -55,3 +55,14 @@ func (m *MockUserService) Signin(ctx context.Context, user *models.User) (*model
 
 	return r0, r1
 }
+
+func (m *MockUserService) UpdateDetails(ctx context.Context, u *models.User) error {
+	args := m.Called(ctx, u)
+
+	var r0 error
+	if args.Get(0) != nil {
+		r0 = args.Get(0).(error)
+	}
+
+	return r0
+}

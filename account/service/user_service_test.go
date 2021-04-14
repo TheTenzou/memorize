@@ -199,3 +199,63 @@ func TestSignin(test *testing.T) {
 		mockUserRepository.AssertCalled(test, "FindByLogin", mockArgs...)
 	})
 }
+
+func TestUpdateDetails(test *testing.T) {
+	mockUserRepository := new(mocks.MockUserRepository)
+	userService := NewUserService(&UserServiceConfig{
+		UserRepository: mockUserRepository,
+	})
+
+	test.Run("Success", func(test *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &models.User{
+			UID:     uid,
+			Email:   "alice@mail.com",
+			Website: "https://alice.me",
+			Name:    "Alice",
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			mockUser,
+		}
+
+		mockUserRepository.
+			On("Update", mockArgs...).Return(nil)
+
+		ctx := context.TODO()
+		err := userService.UpdateDetails(ctx, mockUser)
+
+		assert.NoError(test, err)
+		mockUserRepository.AssertCalled(test, "Update", mockArgs...)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &models.User{
+			UID: uid,
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			mockUser,
+		}
+
+		mockError := apperrors.NewInternal()
+
+		mockUserRepository.
+			On("Update", mockArgs...).Return(mockError)
+
+		ctx := context.TODO()
+		err := userService.UpdateDetails(ctx, mockUser)
+		assert.Error(test, err)
+
+		apperror, ok := err.(*apperrors.Error)
+		assert.True(test, ok)
+		assert.Equal(test, apperrors.Internal, apperror.Type)
+
+		mockUserRepository.AssertCalled(test, "Update", mockArgs...)
+	})
+}

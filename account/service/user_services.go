@@ -10,7 +10,7 @@ import (
 )
 
 type userService struct {
-	UserRespository models.UserRepository
+	UserRepository models.UserRepository
 }
 
 // config hold repositories that will eventually be injected into this this service layer
@@ -21,13 +21,13 @@ type UserServiceConfig struct {
 // factory function for initializing a UserService with its repository layer dependencies
 func NewUserService(config *UserServiceConfig) models.UserService {
 	return &userService{
-		UserRespository: config.UserRepository,
+		UserRepository: config.UserRepository,
 	}
 }
 
 // fetch user by uid
 func (u *userService) GetUser(ctx context.Context, uid uuid.UUID) (*models.User, error) {
-	user, err := u.UserRespository.FindByID(ctx, uid)
+	user, err := u.UserRepository.FindByID(ctx, uid)
 
 	return user, err
 }
@@ -43,7 +43,7 @@ func (u *userService) Signup(ctx context.Context, user *models.User) error {
 
 	user.Password = password
 
-	if err := u.UserRespository.Create(ctx, user); err != nil {
+	if err := u.UserRepository.Create(ctx, user); err != nil {
 		return err
 	}
 
@@ -51,7 +51,7 @@ func (u *userService) Signup(ctx context.Context, user *models.User) error {
 }
 
 func (u *userService) Signin(ctx context.Context, user *models.User) (*models.User, error) {
-	fetchedUser, err := u.UserRespository.FindByLogin(ctx, user.Login)
+	fetchedUser, err := u.UserRepository.FindByLogin(ctx, user.Login)
 
 	// Will return NotAuthorized to client to omit details of why
 	if err != nil {
@@ -70,4 +70,9 @@ func (u *userService) Signin(ctx context.Context, user *models.User) (*models.Us
 	}
 
 	return fetchedUser, nil
+}
+
+// update user details
+func (u *userService) UpdateDetails(ctx context.Context, user *models.User) error {
+	return u.UserRepository.Update(ctx, user)
 }
