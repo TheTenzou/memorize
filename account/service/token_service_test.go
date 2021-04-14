@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"memorize/mocks"
 	"memorize/models"
+	"memorize/models/apperrors"
 	"testing"
 	"time"
 
@@ -161,5 +162,39 @@ func TestNewPairFromUser(test *testing.T) {
 
 		mockTokenRepository.AssertCalled(test, "SetRefreshToken", setSuccessArguments...)
 		mockTokenRepository.AssertNotCalled(test, "DeleteRefreshToken")
+	})
+}
+
+func TestSignout(test *testing.T) {
+	mockTokenRepository := new(mocks.MockTokenRepository)
+	tokenService := NewTokenService(&TokenServiceConfig{
+		TokenRepository: mockTokenRepository,
+	})
+
+	test.Run("No error", func(test *testing.T) {
+		uidSuccess, _ := uuid.NewRandom()
+		mockTokenRepository.
+			On("DeleteUserRefreshTokens", mock.AnythingOfType("*context.emptyCtx"), uidSuccess.String()).
+			Return(nil)
+
+		ctx := context.Background()
+		err := tokenService.Signout(ctx, uidSuccess)
+		assert.NoError(test, err)
+	})
+
+	test.Run("Error", func(test *testing.T) {
+		uidError, _ := uuid.NewRandom()
+		mockTokenRepository.
+			On("DeleteUserRefreshTokens", mock.AnythingOfType("*context.emptyCtx"), uidError.String()).
+			Return(apperrors.NewInternal())
+
+		ctx := context.Background()
+		err := tokenService.Signout(ctx, uidError)
+
+		assert.Error(test, err)
+
+		apperr, ok := err.(*apperrors.Error)
+		assert.True(test, ok)
+		assert.Equal(test, apperr.Type, apperrors.Internal)
 	})
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"memorize/models"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -64,4 +65,15 @@ func (m *MockTokenService) ValidateRefreshToken(tokenString string) (*models.Ref
 	}
 
 	return r0, r1
+}
+
+func (m *MockTokenService) Signout(ctx context.Context, userID uuid.UUID) error {
+	args := m.Called(ctx, userID)
+	var r0 error
+
+	if args.Get(0) != nil {
+		r0 = args.Get(0).(error)
+	}
+
+	return r0
 }
