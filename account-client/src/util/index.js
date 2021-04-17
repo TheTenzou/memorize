@@ -24,10 +24,20 @@ export const doRequest = async (requestOptions) => {
   }
 }
 
+const accessTokenKey = '__memorizerAccess'
+const refreshTokenKey = '__memorizerRefresh'
+
 // store access and refresh tokens
 export const storeTokens = (accessToken, refreshToken) => {
-  localStorage.setItem('__memorizerAccess', accessToken)
-  localStorage.setItem('__memorizerRefresh', refreshToken)
+  localStorage.setItem(accessTokenKey, accessToken)
+  localStorage.setItem(refreshTokenKey, refreshToken)
+}
+
+export const getTokens = () => {
+  return [
+    localStorage.getItem(accessTokenKey),
+    localStorage.getItem(refreshTokenKey),
+  ]
 }
 
 export const getTokenPayload = (token) => {

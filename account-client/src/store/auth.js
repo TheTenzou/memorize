@@ -1,5 +1,5 @@
 import { reactive, provide, inject, toRefs, readonly, watchEffect } from 'vue'
-import { storeTokens, doRequest, getTokenPayload } from '../util'
+import { storeTokens, doRequest, getTokenPayload, getTokens } from '../util'
 import { useRouter } from 'vue-router'
 
 const state = reactive({
@@ -17,6 +17,47 @@ const signin = async (login, password) =>
 const signup = async (login, password) =>
   await authenticate(login, password, '/api/account/signup')
 
+const initializeUser = async () => {
+  state.isLoading = true
+  state.error = null
+
+  const [accessToken, refreshToken] = getTokens()
+
+  const accessTokenClaims = getTokenPayload(accessToken)
+  const refreshTokenClaims = getTokenPayload(refreshToken)
+
+  if (accessTokenClaims) {
+    state.accessToken = accessToken
+    state.currentUser = accessTokenClaims.user
+  }
+
+  state.isLoading = false
+
+  if (!refreshTokenClaims) {
+    return
+  }
+
+  const { data, error } = await doRequest({
+    url: '/api/account/tokens',
+    method: 'post',
+    data: {
+      refreshToken,
+    },
+  })
+
+  if (error) {
+    return
+  }
+
+  const { tokens } = data
+  storeTokens(tokens.accessToken, tokens.refreshToken)
+
+  const updatedTokenClaims = getTokenPayload(tokens.accessToken)
+
+  state.currentUser = updatedTokenClaims.user
+  state.accessToken = tokens.accessToken
+}
+
 export const createAuthStore = (authStoreOption) => {
   const { onAuthRoute, requireAuthRoute } = authStoreOption || {}
 
@@ -24,6 +65,7 @@ export const createAuthStore = (authStoreOption) => {
     ...toRefs(readonly(state)),
     signin,
     signup,
+    initializeUser,
     onAuthRoute,
     requireAuthRoute,
   }
