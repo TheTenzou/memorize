@@ -25,6 +25,7 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import LoginForm from '../components/LoginForm.vue'
+import { useAuth } from '../store/auth'
 
 export default defineComponent({
   name: 'Auth',
@@ -35,13 +36,14 @@ export default defineComponent({
 
   setup() {
     const isLogin = ref(true)
+    const { currentUser, error, isLoading, signin, signup } = useAuth()
 
     const setIsLogin = (nextVal) => {
       isLogin.value = nextVal
     }
 
-    const authSubmitted = ({ email, password }) => {
-      console.log(isLogin, email, password)
+    const authSubmitted = ({ login, password }) => {
+      isLogin.value ? signin(login, password) : signup(login, password)
     }
 
     return {

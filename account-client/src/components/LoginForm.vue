@@ -7,22 +7,22 @@
 
     <input
       type="text"
-      placeholder="Email Address"
-      @input="emailField.handleChange"
-      @blur="emailField.handleBlur"
-      :value="emailField.value"
+      placeholder="Login"
+      @input="loginField.handleChange"
+      @blur="loginField.handleBlur"
+      :value="loginField.value"
       class="px-4 my-2 min-w-full mx-auto border border-gray-500 rounded-full focus:outline-none focus:ring-1 focus:border-blue-300"
     />
     <p
       class="text-center text-red-500"
       :style="{
         visibility:
-          emailField.meta.touched && !emailField.meta.valid
+          loginField.meta.touched && !loginField.meta.valid
             ? 'visible'
             : 'hidden',
       }"
     >
-      {{ emailField.errorMessage || 'Field is Required' }}
+      {{ loginField.errorMessage || 'Field is Required' }}
     </p>
 
     <input
@@ -103,7 +103,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const { meta: formMeta, handleSubmit } = useForm()
-    const emailField = reactive(useField('email', 'email'))
+    const loginField = reactive(useField('login', 'login'))
     const passwordField = reactive(useField('password', 'password'))
 
     const confirmPasswordValidator = computed(() => {
@@ -123,13 +123,13 @@ export default defineComponent({
 
     const submitForm = handleSubmit((formValues) => {
       emit('submitAuth', {
-        email: formValues.email,
+        login: formValues.login,
         password: formValues.password,
       })
     })
 
     return {
-      emailField,
+      loginField,
       passwordField,
       confirmPasswordField,
       submitForm,

@@ -1,12 +1,12 @@
 import { defineRule } from 'vee-validate'
-import { email, required, min, max } from '@vee-validate/rules'
+import { required, min, max } from '@vee-validate/rules'
 
-defineRule('email', (value) => {
-  if (email(value) && required(value)) {
+defineRule('login', (value) => {
+  if (required(value)) {
     return true
   }
 
-  return 'A valid email address is required'
+  return 'A valid login address is required'
 })
 
 defineRule('password', (value) => {
