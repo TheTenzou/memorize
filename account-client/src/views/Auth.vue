@@ -22,6 +22,9 @@
         :isSubmitting="isLoading"
         @submitAuth="authSubmitted"
       />
+      <div v-if="error" class="text-center my-2">
+        <p class="text-red-400">{{ error.message }}</p>
+      </div>
     </div>
   </div>
 </template>
