@@ -1,9 +1,9 @@
 <template>
-  <div class="text-4xl font-bold text-center my-12"> Tailwind Words!</div>
+  <div class="text-4xl font-bold text-center my-12">Tailwind Words!</div>
   <div class="text-xl text-center" v-if="errorCode">
     Error code: {{ errorCode }}
   </div>
-  <div class="text-center" v-if="errorMessage"> {{errorMessage}} </div>
+  <div class="text-center" v-if="errorMessage">{{ errorMessage }}</div>
 </template>
 
 <script>
@@ -18,23 +18,23 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
-        await axios.get('/api/account/me');
-        errorCode.value = null;
-        errorMessage.value = null;
+        await axios.get('/api/account/me')
+        errorCode.value = null
+        errorMessage.value = null
       } catch (error) {
         if (error.response) {
-          errorCode.value = error.response.status;
-          errorMessage.value = error.response.data.error.message;
+          errorCode.value = error.response.status
+          errorMessage.value = error.response.data.error.message
         } else {
-          errorCode.value = 500;
-          errorMessage.value = 'Unknown request error';
+          errorCode.value = 500
+          errorMessage.value = 'Unknown request error'
         }
       }
-    });
+    })
     return {
       errorCode,
       errorMessage,
-    };
-  }
+    }
+  },
 })
 </script>
