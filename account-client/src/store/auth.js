@@ -59,9 +59,12 @@ const authenticate = async (login, password, url) => {
 
   storeTokens(tokens.accessToken, tokens.refreshToken)
 
+  console.log(tokens)
+  console.log(tokens.accessToken)
+
   const tokenClaims = getTokenPayload(tokens.accessToken)
 
   state.accessToken = tokens.accessToken
-  state.currentUser = tokenClaims.currentUser
+  state.currentUser = tokenClaims.user
   state.isLoading = false
 }

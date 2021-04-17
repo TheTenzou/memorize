@@ -17,6 +17,11 @@ export const doRequest = async (requestOptions) => {
       error = err
     }
   }
+
+  return {
+    data,
+    error,
+  }
 }
 
 // store access and refresh tokens
@@ -26,7 +31,6 @@ export const storeTokens = (accessToken, refreshToken) => {
 }
 
 export const getTokenPayload = (token) => {
-  
   if (!token) {
     return null
   }
