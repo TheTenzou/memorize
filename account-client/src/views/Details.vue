@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-4xl font-bol text-center"> {{ currentUser }} </h1>
+  <h1 class="text-4xl font-bol text-center">{{ currentUser }}</h1>
 </template>
 
 <script>
@@ -10,10 +10,10 @@ export default defineComponent({
   name: 'Details',
 
   setup() {
-    const { currentUser } = useAuth()
+    const { currentUser } = useAuth({ requireAuthRoute: '/authenticate' })
 
     return {
-      currentUser
+      currentUser,
     }
   },
 })
