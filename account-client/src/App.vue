@@ -1,34 +1,17 @@
 <template>
-  <h1 class="text-4xl font-bol text-center my-12">Scaffolded App Works Well!</h1>
-  <h3 class="text-sl text-center" v-if="errorCode">
-    Error code: {{ errorCode }}
-  </h3>
-  <h3 class="text-center" v-if="errorMessage">{{ errorMessage }}</h3>
+  <div class="text-4xl font-bol text-center my-2"> App Component</div>
+  <div class="flex justify-around my-4">
+    <router-link to="/">Home/Details</router-link>
+    <router-link to="/authenticate">Auth</router-link>
+    <router-link to="/notroute">Not a route</router-link>
+  </div>
+  <router-view/>
 </template>
 
 <script>
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'App',
-  setup() {
-    const errorCode = ref(null)
-    const errorMessage = ref(null)
-
-    onMounted(async () => {
-      const response = await fetch('/api/account/me', {
-        method: 'GET',
-      })
-
-      const body = await response.json()
-      
-      errorCode.value = response.status
-      errorMessage.value = body.error.message
-    })
-    return {
-      errorCode,
-      errorMessage,
-    }
-  },
+  name: 'App'
 })
 </script>
