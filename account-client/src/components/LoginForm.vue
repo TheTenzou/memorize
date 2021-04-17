@@ -1,6 +1,5 @@
 <template>
   <div class="px-4">
-
     <h1 class="text-xl text-center font-semibold mb-2">
       {{ isLogin ? 'Login' : 'Sign Up' }}
     </h1>
@@ -72,11 +71,16 @@
 
     <div class="flex justify-center mt-4">
       <button
-        class="btn btn-blue mx-1"
+        class="btn btn-blue mx-1 flex items-center"
         :disabled="!formMeta.valid"
         @click="submitForm"
       >
-        {{ isLogin ? 'Login' : 'Sign Up' }}
+        <span>{{ isLogin ? 'Login' : 'Sign Up' }}</span>
+        <Loader
+          v-if="isSubmitting"
+          class="animate-spin stroke-current text-white ml-2"
+          :height="16"
+        />
       </button>
     </div>
   </div>
@@ -85,9 +89,11 @@
 <script>
 import { defineComponent, reactive, computed, watch } from 'vue'
 import { useField, useForm } from 'vee-validate'
+import Loader from './ui/Loader.vue'
 
 export default defineComponent({
   name: 'LoginForm',
+  components: { Loader },
   props: {
     isLogin: {
       type: Boolean,

@@ -17,7 +17,11 @@
           Sign Up
         </li>
       </ul>
-      <LoginForm :isLogin="isLogin" @submitAuth="authSubmitted" />
+      <LoginForm
+        :isLogin="isLogin"
+        :isSubmitting="isLoading"
+        @submitAuth="authSubmitted"
+      />
     </div>
   </div>
 </template>
@@ -50,6 +54,9 @@ export default defineComponent({
       isLogin,
       setIsLogin,
       authSubmitted,
+      currentUser,
+      error,
+      isLoading,
     }
   },
 })
