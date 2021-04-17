@@ -43,9 +43,7 @@ export default defineComponent({
 
   setup() {
     const isLogin = ref(true)
-    const { currentUser, error, isLoading, signin, signup } = useAuth({
-      onAuthRoute: '/',
-    })
+    const { currentUser, error, isLoading, signin, signup } = useAuth()
 
     const setIsLogin = (nextVal) => {
       isLogin.value = nextVal

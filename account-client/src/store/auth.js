@@ -9,42 +9,55 @@ const state = reactive({
   error: null,
 })
 
+const storeSymbol = Symbol()
+
 const signin = async (login, password) =>
   await authenticate(login, password, '/api/account/signin')
 
 const signup = async (login, password) =>
   await authenticate(login, password, '/api/account/signup')
 
-export const authStrore = {
+export const createAuthStore = (authStoreOption) => {
+  const { onAuthRoute, requireAuthRoute } = authStoreOption || {}
+
+  const authStore = {
+    ...toRefs(readonly(state)),
+    signin,
+    signup,
+    onAuthRoute,
+    requireAuthRoute,
+  }
+
+  return {
+    authStore,
+    install: (app) => {
+      app.provide(storeSymbol, authStore)
+    },
+  }
+}
+
+export const authStore = {
   ...toRefs(readonly(state)),
   signin,
   signup,
 }
 
-const storeSymbol = Symbol()
-
-export function provideAuth() {
-  provide(storeSymbol, authStrore)
-}
-
-export function useAuth(useAuthConfig) {
+export function useAuth() {
   const store = inject(storeSymbol)
 
   if (!store) {
     throw new Error('Auth store has not been instantiated!')
   }
 
-  const { onAuthRoute, requireAuthRoute } = useAuthConfig || {}
-
   const router = useRouter()
 
   watchEffect(() => {
-    if (store.currentUser.value && onAuthRoute) {
-      router.push(onAuthRoute)
+    if (store.currentUser.value && store.onAuthRoute) {
+      router.push(store.onAuthRoute)
     }
 
-    if (!store.currentUser.value && requireAuthRoute) {
-      router.push(requireAuthRoute)
+    if (!store.currentUser.value && store.requireAuthRoute) {
+      router.push(store.requireAuthRoute)
     }
   })
 

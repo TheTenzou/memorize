@@ -1,8 +1,14 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
+import { createAuthStore } from '../src/store/auth'
 import router from './router'
 import './validators'
 import './index.css'
 
-createApp(App).use(router).mount('#app')
+const authStore = createAuthStore({
+  onAuthRoute: '/',
+  requireAuthRoute: '/authenticate',
+})
+
+createApp(App).use(authStore).use(router).mount('#app')
