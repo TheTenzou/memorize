@@ -17,6 +17,23 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  account-client:
+    build: 
+      context: ./account-client
+    image: account-client
+    expose: 
+      - "3000"
+    ports: 
+      - "3000:3000"
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.account-client.rule=Host(`localhost`) && PathPrefix(`/account/`)"
+    volumes: 
+      - ./account-client:/app
+      - /app/node_modules
+    depends_on: 
+      - reverse-proxy
   
   account:
     build:
@@ -40,6 +57,7 @@ services:
     depends_on:
       - postgres-account
       - redis-account
+      - reverse-proxy
     command: ./wait-for.sh redis-account:6379 -- ./wait-for.sh postgres-account:5432 -- reflex -r "\.go$$" -s -- sh -c "go run ./"
 
   redis-account:
