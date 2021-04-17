@@ -11,7 +11,7 @@ type RefreshToken struct {
 
 // AccessToken store token properties
 type AccessToken struct {
-	Token string `json:"accesToken"`
+	Token string `json:"accessToken"`
 }
 
 type TokenPair struct {
