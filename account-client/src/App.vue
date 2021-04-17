@@ -1,13 +1,34 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + Vite" />
+  <h1>Scaffolded App Works Well!</h1>
+  <h3 v-if="errorCode">Error code: {{ errorCode }}</h3>
+  <h3 v-if="errorMessage">{{ errorMessage }}</h3>
 </template>
 
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
+<script>
+import { defineComponent, ref, onMounted } from 'vue'
 
-// This starter template is using Vue 3 experimental <script setup> SFCs
-// Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const errorCode = ref(null)
+    const errorMessage = ref(null)
+
+    onMounted(async () => {
+      const response = await fetch('/api/account/me', {
+        method: 'GET',
+      })
+
+      const body = await response.json()
+      
+      errorCode.value = response.status
+      errorMessage.value = body.error.message
+    })
+    return {
+      errorCode,
+      errorMessage,
+    }
+  },
+})
 </script>
 
 <style>
