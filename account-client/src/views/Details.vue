@@ -1,15 +1,23 @@
 <template>
-  <UserForm v-if="meData && !meLoading" :user="meData.user" />
+  <h1 class="text-3xl text-center">User Account</h1>
+  <UserForm
+    v-if="user"
+    :user="user"
+    @detailsSubmitted="handleDetailsSubmitted"
+  />
   <loader
     v-if="meLoading"
     :height="256"
     class="animate-spin stroke-current text-blue-500 mx-auto"
   />
   <p v-if="meError" class="text-center text-red-500">Error fetching user</p>
+  <p v-if="updateDetailsError" class="text-center text-red-500">
+    Failed to update user details
+  </p>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useAuth } from '../store/auth'
 import { useRequest } from '../util/index'
 import UserForm from '../components/UserForm.vue'
@@ -38,10 +46,38 @@ export default defineComponent({
       }
     )
 
+    const {
+      exec: updateDetails,
+      data: updateDetailsData,
+      error: updateDetailsError,
+      loading: updateDetailsLoading,
+    } = useRequest({
+      url: '/api/account/details',
+      method: 'put',
+      headers: {
+        Authorization: `Bearer ${accessToken.value}`,
+      },
+    })
+
+    const handleDetailsSubmitted = (userDetails) => {
+      updateDetails(userDetails)
+    }
+
+    const loading = computed(() => {
+      return meLoading || updateDetailsLoading.value
+    })
+
+    const user = computed(() => {
+      return updateDetailsData?.value?.user || meData?.value?.user
+    })
+
     return {
+      loading,
       meData,
       meError,
-      meLoading,
+      user,
+      handleDetailsSubmitted,
+      updateDetailsError
     }
   },
 })
