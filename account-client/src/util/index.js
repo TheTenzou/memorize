@@ -1,6 +1,8 @@
 import axios from 'axios'
 import jwt_decode from 'jwt-decode'
 
+import { ref, onMounted } from 'vue'
+
 export const doRequest = async (requestOptions) => {
   let error
   let data
@@ -21,6 +23,45 @@ export const doRequest = async (requestOptions) => {
   return {
     data,
     error,
+  }
+}
+
+export const useRequest = (requestOptions, options) => {
+  const { execOnMounted } = options || {}
+  const error = ref(null)
+  const data = ref(null)
+  const loading = ref(false)
+
+  const exec = async (requestData) => {
+    data.value = null
+    loading.value = true
+    error.value = null
+
+    if (requestData) {
+      requestOptions = {
+        ...requestOptions,
+        data: requestData,
+      }
+    }
+
+    const response = await doRequest(requestOptions)
+
+    data.value = response.data
+    error.value = response.error
+    loading.value = false
+  }
+
+  onMounted(() => {
+    if (execOnMounted) {
+      exec()
+    }
+  })
+
+  return {
+    exec,
+    error,
+    data,
+    loading,
   }
 }
 

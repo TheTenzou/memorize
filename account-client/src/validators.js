@@ -1,5 +1,5 @@
 import { defineRule } from 'vee-validate'
-import { required, min, max } from '@vee-validate/rules'
+import { required, email, min, max } from '@vee-validate/rules'
 
 defineRule('login', (value) => {
   if (required(value)) {
@@ -7,6 +7,14 @@ defineRule('login', (value) => {
   }
 
   return 'A valid login address is required'
+})
+
+defineRule('email', (value) => {
+  if (email(value) && required(value)) {
+    return true
+  }
+
+  return 'A valid email address is required'
 })
 
 defineRule('password', (value) => {
@@ -27,4 +35,25 @@ defineRule('confirmPassword', (value, [target], ctx) => {
   }
 
   return 'Passwords must match'
+})
+
+defineRule('name', (value) => {
+  return max(value, { length: 60 }) ? true : 'Name may not exceed 60 characters'
+})
+
+// use regex patter for URL
+defineRule('url', (value) => {
+  const pattern = new RegExp(
+    '^(https?:\\/\\/)' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
+    'i'
+  )
+
+  return pattern.test(value) || value.length === 0
+    ? true
+    : 'Website must be a valid URL'
 })

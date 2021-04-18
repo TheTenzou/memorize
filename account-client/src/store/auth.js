@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 
 const state = reactive({
   currentUser: null,
-  idToken: null,
+  accessToken: null,
   isLoading: false,
   error: null,
 })
