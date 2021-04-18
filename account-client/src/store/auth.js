@@ -1,5 +1,5 @@
 import { reactive, provide, inject, toRefs, readonly, watchEffect } from 'vue'
-import { storeTokens, doRequest, getTokenPayload, getTokens } from '../util'
+import { storeTokens, doRequest, getTokenPayload, getTokens, removeTokens } from '../util'
 import { useRouter } from 'vue-router'
 
 const state = reactive({
@@ -16,6 +16,32 @@ const signin = async (login, password) =>
 
 const signup = async (login, password) =>
   await authenticate(login, password, '/api/account/signup')
+
+const signout = async () => {
+  state.isLoading = true
+  state.error = null
+
+  const { error } = await doRequest({
+    url: '/api/account/signout',
+    method: 'post',
+    headers: {
+      Authorization: `Bearer ${state.accessToken}`,
+    },
+  })
+
+  if (error) {
+    state.error = error
+    state.isLoading = false
+    return
+  }
+
+  state.currentUser = null
+  state.accessToken = null
+
+  removeTokens()
+
+  state.isLoading = false
+}                          
 
 const initializeUser = async () => {
   state.isLoading = true
@@ -65,6 +91,7 @@ export const createAuthStore = (authStoreOption) => {
     ...toRefs(readonly(state)),
     signin,
     signup,
+    signout,
     initializeUser,
     onAuthRoute,
     requireAuthRoute,
