@@ -38,7 +38,7 @@ func TestDetails(test *testing.T) {
 	})
 
 	test.Run("Data binding error", func(test *testing.T) {
-		rr := httptest.NewRecorder()
+		recorder := httptest.NewRecorder()
 
 		reqBody, _ := json.Marshal(gin.H{
 			"email": "notanemail",
@@ -46,26 +46,26 @@ func TestDetails(test *testing.T) {
 		request, _ := http.NewRequest(http.MethodPut, "/details", bytes.NewBuffer(reqBody))
 		request.Header.Set("Content-Type", "application/json")
 
-		router.ServeHTTP(rr, request)
+		router.ServeHTTP(recorder, request)
 
-		assert.Equal(test, http.StatusBadRequest, rr.Code)
+		assert.Equal(test, http.StatusBadRequest, recorder.Code)
 		mockUserService.AssertNotCalled(test, "UpdateDetails")
 	})
 
 	test.Run("Update success", func(test *testing.T) {
-		rr := httptest.NewRecorder()
+		recorder := httptest.NewRecorder()
 
 		newName := "alice"
 		newEmail := "alice@mail.com"
 		newWebsite := "https://alice.me"
 
-		reqBody, _ := json.Marshal(gin.H{
+		requestBody, _ := json.Marshal(gin.H{
 			"name":    newName,
 			"email":   newEmail,
 			"website": newWebsite,
 		})
 
-		request, _ := http.NewRequest(http.MethodPut, "/details", bytes.NewBuffer(reqBody))
+		request, _ := http.NewRequest(http.MethodPut, "/details", bytes.NewBuffer(requestBody))
 		request.Header.Set("Content-Type", "application/json")
 
 		userToUpdate := &models.User{
@@ -75,7 +75,7 @@ func TestDetails(test *testing.T) {
 			Website: newWebsite,
 		}
 
-		updateArgs := mock.Arguments{
+		updateArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			userToUpdate,
 		}
@@ -83,39 +83,39 @@ func TestDetails(test *testing.T) {
 		dbImageURL := "https://alice.me/static/696292a38f49.jpg"
 
 		mockUserService.
-			On("UpdateDetails", updateArgs...).
+			On("UpdateDetails", updateArguments...).
 			Run(func(args mock.Arguments) {
 				userArg := args.Get(1).(*models.User)
 				userArg.ImageURL = dbImageURL
 			}).
 			Return(nil)
 
-		router.ServeHTTP(rr, request)
+		router.ServeHTTP(recorder, request)
 
 		userToUpdate.ImageURL = dbImageURL
-		respBody, _ := json.Marshal(gin.H{
+		responseBody, _ := json.Marshal(gin.H{
 			"user": userToUpdate,
 		})
 
-		assert.Equal(test, http.StatusOK, rr.Code)
-		assert.Equal(test, respBody, rr.Body.Bytes())
-		mockUserService.AssertCalled(test, "UpdateDetails", updateArgs...)
+		assert.Equal(test, http.StatusOK, recorder.Code)
+		assert.Equal(test, responseBody, recorder.Body.Bytes())
+		mockUserService.AssertCalled(test, "UpdateDetails", updateArguments...)
 	})
 
 	test.Run("Update failure", func(test *testing.T) {
-		rr := httptest.NewRecorder()
+		recorder := httptest.NewRecorder()
 
 		newName := "alice"
 		newEmail := "alice@mail.com"
 		newWebsite := "https://alice.me"
 
-		reqBody, _ := json.Marshal(gin.H{
+		requestBody, _ := json.Marshal(gin.H{
 			"name":    newName,
 			"email":   newEmail,
 			"website": newWebsite,
 		})
 
-		request, _ := http.NewRequest(http.MethodPut, "/details", bytes.NewBuffer(reqBody))
+		request, _ := http.NewRequest(http.MethodPut, "/details", bytes.NewBuffer(requestBody))
 		request.Header.Set("Content-Type", "application/json")
 
 		userToUpdate := &models.User{
@@ -125,7 +125,7 @@ func TestDetails(test *testing.T) {
 			Website: newWebsite,
 		}
 
-		updateArgs := mock.Arguments{
+		updateArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			userToUpdate,
 		}
@@ -133,17 +133,17 @@ func TestDetails(test *testing.T) {
 		mockError := apperrors.NewInternal()
 
 		mockUserService.
-			On("UpdateDetails", updateArgs...).
+			On("UpdateDetails", updateArguments...).
 			Return(mockError)
 
-		router.ServeHTTP(rr, request)
+		router.ServeHTTP(recorder, request)
 
-		respBody, _ := json.Marshal(gin.H{
+		responseBody, _ := json.Marshal(gin.H{
 			"error": mockError,
 		})
 
-		assert.Equal(test, mockError.Status(), rr.Code)
-		assert.Equal(test, respBody, rr.Body.Bytes())
-		mockUserService.AssertCalled(test, "UpdateDetails", updateArgs...)
+		assert.Equal(test, mockError.Status(), recorder.Code)
+		assert.Equal(test, responseBody, recorder.Body.Bytes())
+		mockUserService.AssertCalled(test, "UpdateDetails", updateArguments...)
 	})
 }

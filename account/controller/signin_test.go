@@ -36,14 +36,13 @@ func TestSignin(test *testing.T) {
 	test.Run("Bad request data", func(test *testing.T) {
 		recorder := httptest.NewRecorder()
 
-		// create a request body with invalid fields
-		reqBody, err := json.Marshal(gin.H{
+		requestBody, err := json.Marshal(gin.H{
 			"login":    "",
 			"password": "short",
 		})
 		assert.NoError(test, err)
 
-		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(reqBody))
+		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(requestBody))
 		assert.NoError(test, err)
 
 		request.Header.Set("Content-Type", "application/json")
@@ -58,7 +57,7 @@ func TestSignin(test *testing.T) {
 		login := "alice"
 		password := "alicepassword"
 
-		mockUserServiceArgs := mock.Arguments{
+		mockUserServiceArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			&models.User{
 				Login:    login,
@@ -68,23 +67,23 @@ func TestSignin(test *testing.T) {
 
 		mockError := apperrors.NewAuthorization("invalid email/password combo")
 
-		mockUserService.On("Signin", mockUserServiceArgs...).Return(nil, mockError)
+		mockUserService.On("Signin", mockUserServiceArguments...).Return(nil, mockError)
 
 		recorder := httptest.NewRecorder()
 
-		reqBody, err := json.Marshal(gin.H{
+		requestBody, err := json.Marshal(gin.H{
 			"login":    login,
 			"password": password,
 		})
 		assert.NoError(test, err)
 
-		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(reqBody))
+		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(requestBody))
 		assert.NoError(test, err)
 
 		request.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(recorder, request)
 
-		mockUserService.AssertCalled(test, "Signin", mockUserServiceArgs...)
+		mockUserService.AssertCalled(test, "Signin", mockUserServiceArguments...)
 		mockTokenService.AssertNotCalled(test, "NewTokensFromUser")
 		assert.Equal(test, http.StatusUnauthorized, recorder.Code)
 	})
@@ -95,7 +94,7 @@ func TestSignin(test *testing.T) {
 		password := "alicePassword"
 		hashedPassword, _ := service.HashPassword(password)
 
-		mockUSArgs := mock.Arguments{
+		mockUserServiceArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			&models.User{
 				Login:    login,
@@ -109,9 +108,9 @@ func TestSignin(test *testing.T) {
 			Password: hashedPassword,
 		}
 
-		mockUserService.On("Signin", mockUSArgs...).Return(mockUser, nil)
+		mockUserService.On("Signin", mockUserServiceArguments...).Return(mockUser, nil)
 
-		mockTSArgs := mock.Arguments{
+		mockTokenServiceArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			mockUser,
 			"",
@@ -126,32 +125,32 @@ func TestSignin(test *testing.T) {
 			},
 		}
 
-		mockTokenService.On("NewPairFromUser", mockTSArgs...).Return(mockTokenPair, nil)
+		mockTokenService.On("NewPairFromUser", mockTokenServiceArguments...).Return(mockTokenPair, nil)
 
 		recorder := httptest.NewRecorder()
 
-		reqBody, err := json.Marshal(gin.H{
+		requestBody, err := json.Marshal(gin.H{
 			"login":    login,
 			"password": password,
 		})
 		assert.NoError(test, err)
 
-		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(reqBody))
+		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(requestBody))
 		assert.NoError(test, err)
 
 		request.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(recorder, request)
 
-		respBody, err := json.Marshal(gin.H{
+		responseBody, err := json.Marshal(gin.H{
 			"tokens": mockTokenPair,
 		})
 		assert.NoError(test, err)
 
 		assert.Equal(test, http.StatusOK, recorder.Code)
-		assert.Equal(test, respBody, recorder.Body.Bytes())
+		assert.Equal(test, responseBody, recorder.Body.Bytes())
 
-		mockUserService.AssertCalled(test, "Signin", mockUSArgs...)
-		mockTokenService.AssertCalled(test, "NewPairFromUser", mockTSArgs...)
+		mockUserService.AssertCalled(test, "Signin", mockUserServiceArguments...)
+		mockTokenService.AssertCalled(test, "NewPairFromUser", mockTokenServiceArguments...)
 	})
 
 	test.Run("Failed Token Creation", func(test *testing.T) {
@@ -160,7 +159,7 @@ func TestSignin(test *testing.T) {
 		password := "cannotproducetoken"
 		hashedPassword, _ := service.HashPassword(password)
 
-		mockUSArgs := mock.Arguments{
+		mockUserServiceArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			&models.User{
 				Login:    login,
@@ -174,25 +173,25 @@ func TestSignin(test *testing.T) {
 			Password: hashedPassword,
 		}
 
-		mockUserService.On("Signin", mockUSArgs...).Return(mockUser, nil)
+		mockUserService.On("Signin", mockUserServiceArguments...).Return(mockUser, nil)
 
-		mockTSArgs := mock.Arguments{
+		mockTokenServiceArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			mockUser,
 			"",
 		}
 
 		mockError := apperrors.NewInternal()
-		mockTokenService.On("NewPairFromUser", mockTSArgs...).Return(nil, mockError)
+		mockTokenService.On("NewPairFromUser", mockTokenServiceArguments...).Return(nil, mockError)
 		recorder := httptest.NewRecorder()
 
-		reqBody, err := json.Marshal(gin.H{
+		requestBody, err := json.Marshal(gin.H{
 			"login":    login,
 			"password": password,
 		})
 		assert.NoError(test, err)
 
-		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(reqBody))
+		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(requestBody))
 		assert.NoError(test, err)
 
 		request.Header.Set("Content-Type", "application/json")
@@ -206,7 +205,7 @@ func TestSignin(test *testing.T) {
 		assert.Equal(test, mockError.Status(), recorder.Code)
 		assert.Equal(test, respBody, recorder.Body.Bytes())
 
-		mockUserService.AssertCalled(test, "Signin", mockUSArgs...)
-		mockTokenService.AssertCalled(test, "NewPairFromUser", mockTSArgs...)
+		mockUserService.AssertCalled(test, "Signin", mockUserServiceArguments...)
+		mockTokenService.AssertCalled(test, "NewPairFromUser", mockTokenServiceArguments...)
 	})
 }

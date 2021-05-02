@@ -8,18 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (c *controller) Signout(ginContext *gin.Context) {
-	user := ginContext.MustGet("user")
+func (c *controller) Signout(ctx *gin.Context) {
+	user := ctx.MustGet("user")
 
-	ctx := ginContext.Request.Context()
-	if err := c.TokenService.Signout(ctx, user.(*models.User).UID); err != nil {
-		ginContext.JSON(apperrors.Status(err), gin.H{
+	requestCtx := ctx.Request.Context()
+	if err := c.TokenService.Signout(requestCtx, user.(*models.User).UID); err != nil {
+		ctx.JSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})
 		return
 	}
 
-	ginContext.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": "user signed out successfully!",
 	})
 }

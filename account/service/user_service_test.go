@@ -17,7 +17,7 @@ func TestGet(test *testing.T) {
 	test.Run("Success", func(test *testing.T) {
 		uid, _ := uuid.NewRandom()
 
-		mockUserResponce := &models.User{
+		mockUserResponse := &models.User{
 			UID:   uid,
 			Email: "Alice@alice.com",
 			Name:  "Alice",
@@ -28,13 +28,13 @@ func TestGet(test *testing.T) {
 			UserRepository: mockUserRepository,
 		})
 
-		mockUserRepository.On("FindByID", mock.Anything, uid).Return(mockUserResponce, nil)
+		mockUserRepository.On("FindByID", mock.Anything, uid).Return(mockUserResponse, nil)
 
 		ctx := context.TODO()
 		user, err := userService.GetUser(ctx, uid)
 
 		assert.NoError(test, err)
-		assert.Equal(test, user, mockUserResponce)
+		assert.Equal(test, user, mockUserResponse)
 		mockUserRepository.AssertExpectations(test)
 	})
 
@@ -182,13 +182,13 @@ func TestSignin(test *testing.T) {
 			Password: hashedValidPassword,
 		}
 
-		mockArgs := mock.Arguments{
+		mockArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			login,
 		}
 
 		mockUserRepository.
-			On("FindByLogin", mockArgs...).Return(mockUserResponse, nil)
+			On("FindByLogin", mockArguments...).Return(mockUserResponse, nil)
 
 		ctx := context.TODO()
 		loginUser, err := userService.Signin(ctx, mockUser)
@@ -196,7 +196,7 @@ func TestSignin(test *testing.T) {
 
 		assert.Error(test, err)
 		assert.EqualError(test, err, "Invalid login and password combination")
-		mockUserRepository.AssertCalled(test, "FindByLogin", mockArgs...)
+		mockUserRepository.AssertCalled(test, "FindByLogin", mockArguments...)
 	})
 }
 
@@ -216,19 +216,19 @@ func TestUpdateDetails(test *testing.T) {
 			Name:    "Alice",
 		}
 
-		mockArgs := mock.Arguments{
+		mockArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			mockUser,
 		}
 
 		mockUserRepository.
-			On("Update", mockArgs...).Return(nil)
+			On("Update", mockArguments...).Return(nil)
 
 		ctx := context.TODO()
 		err := userService.UpdateDetails(ctx, mockUser)
 
 		assert.NoError(test, err)
-		mockUserRepository.AssertCalled(test, "Update", mockArgs...)
+		mockUserRepository.AssertCalled(test, "Update", mockArguments...)
 	})
 
 	test.Run("Failure", func(test *testing.T) {
@@ -238,7 +238,7 @@ func TestUpdateDetails(test *testing.T) {
 			UID: uid,
 		}
 
-		mockArgs := mock.Arguments{
+		mockArguments := mock.Arguments{
 			mock.AnythingOfType("*context.emptyCtx"),
 			mockUser,
 		}
@@ -246,7 +246,7 @@ func TestUpdateDetails(test *testing.T) {
 		mockError := apperrors.NewInternal()
 
 		mockUserRepository.
-			On("Update", mockArgs...).Return(mockError)
+			On("Update", mockArguments...).Return(mockError)
 
 		ctx := context.TODO()
 		err := userService.UpdateDetails(ctx, mockUser)
@@ -256,6 +256,6 @@ func TestUpdateDetails(test *testing.T) {
 		assert.True(test, ok)
 		assert.Equal(test, apperrors.Internal, apperror.Type)
 
-		mockUserRepository.AssertCalled(test, "Update", mockArgs...)
+		mockUserRepository.AssertCalled(test, "Update", mockArguments...)
 	})
 }

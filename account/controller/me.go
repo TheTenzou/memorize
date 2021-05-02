@@ -11,13 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (c *controller) Me(context *gin.Context) {
-	user, exists := context.Get("user")
+func (c *controller) Me(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
 
 	if !exists {
-		log.Printf("Unable to extract user from request context unknown reason: %v\n", context)
+		log.Printf("Unable to extract user from request context unknown reason: %v\n", ctx)
 		err := apperrors.NewInternal()
-		context.JSON(err.Status(), gin.H{
+		ctx.JSON(err.Status(), gin.H{
 			"error": err,
 		})
 
@@ -26,21 +26,21 @@ func (c *controller) Me(context *gin.Context) {
 
 	uid := user.(*models.User).UID
 
-	requestContext := context.Request.Context()
-	u, err := c.UserService.GetUser(requestContext, uid)
+	requestContext := ctx.Request.Context()
+	userFromDB, err := c.UserService.GetUser(requestContext, uid)
 
 	if err != nil {
 		log.Printf("Unable to find user: %v\n%v", uid, err)
 		e := apperrors.NewNotFound("user", uid.String())
 
-		context.JSON(e.Status(), gin.H{
+		ctx.JSON(e.Status(), gin.H{
 			"error": e,
 		})
 
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{
-		"user": u,
+	ctx.JSON(http.StatusOK, gin.H{
+		"user": userFromDB,
 	})
 }

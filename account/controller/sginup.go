@@ -14,10 +14,10 @@ type signinRequest struct {
 	Password string `json:"password" binding:"required,gte=6,lte=30"`
 }
 
-func (c *controller) Signup(context *gin.Context) {
+func (c *controller) Signup(ctx *gin.Context) {
 	var request signinRequest
 
-	if ok := bindData(context, &request); !ok {
+	if ok := bindData(ctx, &request); !ok {
 		return
 	}
 
@@ -26,12 +26,12 @@ func (c *controller) Signup(context *gin.Context) {
 		Password: request.Password,
 	}
 
-	requestContext := context.Request.Context()
+	requestContext := ctx.Request.Context()
 	err := c.UserService.Signup(requestContext, user)
 
 	if err != nil {
 		log.Printf("Faild to sign up user: %v\n", err.Error())
-		context.JSON(apperrors.Status(err), gin.H{
+		ctx.JSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})
 		return
@@ -42,14 +42,14 @@ func (c *controller) Signup(context *gin.Context) {
 	if err != nil {
 		log.Printf("Failded to create tokens for user: %v\n", err.Error())
 
-		context.JSON(apperrors.Status(err), gin.H{
+		ctx.JSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})
 
 		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{
+	ctx.JSON(http.StatusCreated, gin.H{
 		"tokens": tokens,
 	})
 }

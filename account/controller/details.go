@@ -9,18 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type detailsReq struct {
+type detailsRequset struct {
 	Name    string `json:"name" binding:"omitempty,max=50"`
 	Email   string `json:"email" binding:"omitempty,email"`
 	Website string `json:"website" binding:"omitempty,url"`
 }
 
-func (c *controller) Details(ginContext *gin.Context) {
-	authUser := ginContext.MustGet("user").(*models.User)
+func (c *controller) Details(ctx *gin.Context) {
+	authUser := ctx.MustGet("user").(*models.User)
 
-	var request detailsReq
+	var request detailsRequset
 
-	if ok := bindData(ginContext, &request); !ok {
+	if ok := bindData(ctx, &request); !ok {
 		return
 	}
 
@@ -31,19 +31,19 @@ func (c *controller) Details(ginContext *gin.Context) {
 		Website: request.Website,
 	}
 
-	ctx := ginContext.Request.Context()
-	err := c.UserService.UpdateDetails(ctx, user)
+	requestCtx := ctx.Request.Context()
+	err := c.UserService.UpdateDetails(requestCtx, user)
 
 	if err != nil {
 		log.Printf("Failed to update user: %v\n", err.Error())
 
-		ginContext.JSON(apperrors.Status(err), gin.H{
+		ctx.JSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})
 		return
 	}
 
-	ginContext.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"user": user,
 	})
 }

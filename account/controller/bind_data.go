@@ -18,24 +18,24 @@ type invalidArgument struct {
 
 // bindData return false if data is not bound
 // if not bound set response with error
-func bindData(c *gin.Context, request interface{}) bool {
+func bindData(ctx *gin.Context, request interface{}) bool {
 
-	if c.ContentType() != "application/json" {
-		message := fmt.Sprintf("%s only accepts Content-Type application/json", c.FullPath())
+	if ctx.ContentType() != "application/json" {
+		message := fmt.Sprintf("%s only accepts Content-Type application/json", ctx.FullPath())
 
 		err := apperrors.NewUnsupportedMediaType(message)
 
-		c.JSON(err.Status(), gin.H{
+		ctx.JSON(err.Status(), gin.H{
 			"error": err,
 		})
 
 		return false
 	}
 
-	if err := c.ShouldBind(request); err != nil {
+	if err := ctx.ShouldBind(request); err != nil {
 		log.Printf("Error binding data: %v\n", err)
 
-		handelError(c, err)
+		handelError(ctx, err)
 
 		return false
 	}
@@ -43,7 +43,7 @@ func bindData(c *gin.Context, request interface{}) bool {
 	return true
 }
 
-func handelError(c *gin.Context, err error) {
+func handelError(ctx *gin.Context, err error) {
 	if errs, ok := err.(validator.ValidationErrors); ok {
 		var invalidArgs []invalidArgument
 
@@ -58,7 +58,7 @@ func handelError(c *gin.Context, err error) {
 
 		err := apperrors.NewBadRequest("Invalid request parametrs. See invalidArgs")
 
-		c.JSON(err.Status(), gin.H{
+		ctx.JSON(err.Status(), gin.H{
 			"error":       err,
 			"invalidArgs": invalidArgs,
 		})
@@ -68,7 +68,7 @@ func handelError(c *gin.Context, err error) {
 
 	fallBack := apperrors.NewInternal()
 
-	c.JSON(fallBack.Status(), gin.H{
+	ctx.JSON(fallBack.Status(), gin.H{
 		"error": fallBack,
 	})
 }

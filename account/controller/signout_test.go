@@ -44,12 +44,12 @@ func TestSignout(test *testing.T) {
 		request, _ := http.NewRequest(http.MethodPost, "/signout", nil)
 		router.ServeHTTP(recorder, request)
 
-		respBody, _ := json.Marshal(gin.H{
+		responseBody, _ := json.Marshal(gin.H{
 			"message": "user signed out successfully!",
 		})
 
 		assert.Equal(test, http.StatusOK, recorder.Code)
-		assert.Equal(test, respBody, recorder.Body.Bytes())
+		assert.Equal(test, responseBody, recorder.Body.Bytes())
 	})
 
 	test.Run("Signout Error", func(test *testing.T) {

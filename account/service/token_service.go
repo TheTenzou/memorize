@@ -43,34 +43,34 @@ func NewTokenService(config *TokenServiceConfig) models.TokenService {
 
 // create new pair of tokens
 // if previous token included, the previous token is removed
-func (service *tokenService) NewPairFromUser(
+func (s *tokenService) NewPairFromUser(
 	ctx context.Context,
 	user *models.User,
 	previousTokenID string,
 ) (*models.TokenPair, error) {
 
 	if previousTokenID != "" {
-		if err := service.TokenRepository.DeleteRefreshToken(ctx, user.UID.String(), previousTokenID); err != nil {
+		if err := s.TokenRepository.DeleteRefreshToken(ctx, user.UID.String(), previousTokenID); err != nil {
 			log.Printf("Cold not delete previous refresh token for uid: %v, tokne %v\n", user.UID.String(), previousTokenID)
 
 			return nil, err
 		}
 	}
 
-	accessToken, err := generateToken(user, service.PrivateKey, service.TokenExpirationSec)
+	accessToken, err := generateToken(user, s.PrivateKey, s.TokenExpirationSec)
 
 	if err != nil {
 		log.Printf("Error generating idToken for uid: %v, Error: %v\n", user.UID, err.Error())
 		return nil, apperrors.NewInternal()
 	}
 
-	refreshToken, err := generateRefreshToken(user.UID, service.RefreshSecret, service.RefreshTokenExpirationSec)
+	refreshToken, err := generateRefreshToken(user.UID, s.RefreshSecret, s.RefreshTokenExpirationSec)
 
 	if err != nil {
 		log.Printf("Error genaraating refreshToken for uid: %v. Error %v\n", user.UID, err.Error())
 	}
 
-	if err := service.TokenRepository.SetRefreshToken(
+	if err := s.TokenRepository.SetRefreshToken(
 		ctx, user.UID.String(),
 		refreshToken.ID.String(),
 		refreshToken.ExpiresIn,
@@ -80,7 +80,7 @@ func (service *tokenService) NewPairFromUser(
 	}
 
 	if previousTokenID != "" {
-		if err := service.TokenRepository.DeleteRefreshToken(
+		if err := s.TokenRepository.DeleteRefreshToken(
 			ctx,
 			user.UID.String(),
 			previousTokenID,
@@ -103,8 +103,8 @@ func (service *tokenService) NewPairFromUser(
 
 // validates the id token jwt string
 // it returns the user extract from the IDTokenCustomClaims
-func (service *tokenService) ValidateAccessToken(tokenString string) (*models.User, error) {
-	claims, err := validateAccessToken(tokenString, service.PublicKey) // uses public RSA key
+func (s *tokenService) ValidateAccessToken(tokenString string) (*models.User, error) {
+	claims, err := validateAccessToken(tokenString, s.PublicKey) // uses public RSA key
 
 	if err != nil {
 		log.Printf("Unable to validate or parse idToken - Error: %v\n", err)

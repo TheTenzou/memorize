@@ -23,10 +23,10 @@ func NewUserRepository(db *sqlx.DB) models.UserRepository {
 }
 
 // create user record in database
-func (repository *pgUserRepository) Create(ctx context.Context, user *models.User) error {
+func (r *pgUserRepository) Create(ctx context.Context, user *models.User) error {
 	query := "INSERT INTO users (login, password) VALUES ($1, $2) RETURNING *"
 
-	if err := repository.DB.GetContext(ctx, user, query, user.Login, user.Password); err != nil {
+	if err := r.DB.GetContext(ctx, user, query, user.Login, user.Password); err != nil {
 
 		// check unique constraint
 		if err, ok := err.(*pq.Error); ok && err.Code.Name() == "unique_violation" {
@@ -46,12 +46,12 @@ func (repository *pgUserRepository) Create(ctx context.Context, user *models.Use
 }
 
 // fetch user by id from database
-func (repository *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*models.User, error) {
+func (r *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*models.User, error) {
 	user := &models.User{}
 
 	query := "SELECT * FROM users WHERE uid=$1"
 
-	if err := repository.DB.GetContext(ctx, user, query, uid); err != nil {
+	if err := r.DB.GetContext(ctx, user, query, uid); err != nil {
 		return user, apperrors.NewNotFound("uid", uid.String())
 	}
 
@@ -59,12 +59,12 @@ func (repository *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID)
 }
 
 // fetch user by login from databse
-func (repository *pgUserRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
+func (r *pgUserRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
 	user := &models.User{}
 
 	query := "SELECT * FROM users WHERE login=$1"
 
-	if err := repository.DB.GetContext(ctx, user, query, login); err != nil {
+	if err := r.DB.GetContext(ctx, user, query, login); err != nil {
 		log.Printf("Unable to get user with login: %v. err %v\n", login, err)
 		return nil, apperrors.NewNotFound("login", login)
 	}
@@ -74,7 +74,7 @@ func (repository *pgUserRepository) FindByLogin(ctx context.Context, login strin
 
 // Update updates a user's properties
 // TODO fix user mutation
-func (repository *pgUserRepository) Update(ctx context.Context, user *models.User) error {
+func (r *pgUserRepository) Update(ctx context.Context, user *models.User) error {
 	query := `
 		UPDATE users 
 		SET name=:name, email=:email, website=:website
@@ -82,7 +82,7 @@ func (repository *pgUserRepository) Update(ctx context.Context, user *models.Use
 		RETURNING *;
 	`
 
-	preparedQuery, err := repository.DB.PrepareNamedContext(ctx, query)
+	preparedQuery, err := r.DB.PrepareNamedContext(ctx, query)
 
 	if err != nil {
 		log.Printf("Unable to prepare user update query: %v\n", err)

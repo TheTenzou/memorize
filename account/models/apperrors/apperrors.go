@@ -6,7 +6,6 @@ import (
 	"net/http"
 )
 
-// TODO redo errors
 type Type string
 
 const (

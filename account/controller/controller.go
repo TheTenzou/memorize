@@ -53,14 +53,14 @@ func NewController(config *Config) {
 	group.DELETE("/image", ctrl.DeleteImage)
 }
 
-func (c *controller) Image(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{
+func (c *controller) Image(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
 		"hello": "it's image",
 	})
 }
 
-func (c *controller) DeleteImage(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{
+func (c *controller) DeleteImage(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
 		"hello": "it's delete image",
 	})
 }

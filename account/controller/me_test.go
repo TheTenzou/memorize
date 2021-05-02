@@ -17,10 +17,10 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestMe(t *testing.T) {
+func TestMe(test *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	t.Run("Success", func(t *testing.T) {
+	test.Run("Success", func(test *testing.T) {
 		uid, _ := uuid.NewRandom()
 
 		mockUserResp := &models.User{
@@ -48,7 +48,7 @@ func TestMe(t *testing.T) {
 
 		request, err := http.NewRequest(http.MethodGet, "/me", nil)
 
-		assert.NoError(t, err)
+		assert.NoError(test, err)
 
 		router.ServeHTTP(recorder, request)
 
@@ -56,14 +56,14 @@ func TestMe(t *testing.T) {
 			"user": mockUserResp,
 		})
 
-		assert.NoError(t, err)
+		assert.NoError(test, err)
 
-		assert.Equal(t, 200, recorder.Code)
-		assert.Equal(t, respBody, recorder.Body.Bytes())
-		mockUserService.AssertExpectations(t)
+		assert.Equal(test, 200, recorder.Code)
+		assert.Equal(test, respBody, recorder.Body.Bytes())
+		mockUserService.AssertExpectations(test)
 	})
 
-	t.Run("NoContextUser", func(t *testing.T) {
+	test.Run("NoContextUser", func(t *testing.T) {
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On("GetUser", mock.Anything, mock.Anything).Return(nil, nil)
 
@@ -84,7 +84,7 @@ func TestMe(t *testing.T) {
 		mockUserService.AssertNotCalled(t, "GetUser", mock.Anything)
 	})
 
-	t.Run("NotFound", func(t *testing.T) {
+	test.Run("NotFound", func(t *testing.T) {
 		uid, _ := uuid.NewRandom()
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On("GetUser", mock.Anything, uid).Return(nil, fmt.Errorf("Some error down call chain"))

@@ -26,14 +26,12 @@ func NewUserService(config *UserServiceConfig) models.UserService {
 }
 
 // fetch user by uid
-func (u *userService) GetUser(ctx context.Context, uid uuid.UUID) (*models.User, error) {
-	user, err := u.UserRepository.FindByID(ctx, uid)
-
-	return user, err
+func (s *userService) GetUser(ctx context.Context, uid uuid.UUID) (*models.User, error) {
+	return s.UserRepository.FindByID(ctx, uid)
 }
 
 // signup user if login avaliable
-func (u *userService) Signup(ctx context.Context, user *models.User) error {
+func (s *userService) Signup(ctx context.Context, user *models.User) error {
 	password, err := HashPassword(user.Password)
 
 	if err != nil {
@@ -43,15 +41,15 @@ func (u *userService) Signup(ctx context.Context, user *models.User) error {
 
 	user.Password = password
 
-	if err := u.UserRepository.Create(ctx, user); err != nil {
+	if err := s.UserRepository.Create(ctx, user); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (u *userService) Signin(ctx context.Context, user *models.User) (*models.User, error) {
-	fetchedUser, err := u.UserRepository.FindByLogin(ctx, user.Login)
+func (s *userService) Signin(ctx context.Context, user *models.User) (*models.User, error) {
+	fetchedUser, err := s.UserRepository.FindByLogin(ctx, user.Login)
 
 	// Will return NotAuthorized to client to omit details of why
 	if err != nil {
@@ -73,6 +71,6 @@ func (u *userService) Signin(ctx context.Context, user *models.User) (*models.Us
 }
 
 // update user details
-func (u *userService) UpdateDetails(ctx context.Context, user *models.User) error {
-	return u.UserRepository.Update(ctx, user)
+func (s *userService) UpdateDetails(ctx context.Context, user *models.User) error {
+	return s.UserRepository.Update(ctx, user)
 }

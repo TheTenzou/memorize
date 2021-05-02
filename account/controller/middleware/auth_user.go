@@ -23,12 +23,12 @@ type invalidArgument struct {
 // extracts a user from the Authorization header
 // It sets the user to the context if the user exists
 func AuthUser(s models.TokenService) gin.HandlerFunc {
-	return func(ginContext *gin.Context) {
+	return func(ctx *gin.Context) {
 		header := authHeader{}
 
-		if err := ginContext.ShouldBindHeader(&header); err != nil {
-			handleError(ginContext, err)
-			ginContext.Abort()
+		if err := ctx.ShouldBindHeader(&header); err != nil {
+			handleError(ctx, err)
+			ctx.Abort()
 			return
 		}
 
@@ -37,10 +37,10 @@ func AuthUser(s models.TokenService) gin.HandlerFunc {
 		if len(idTokenHeader) < 2 {
 			err := apperrors.NewAuthorization("Must provide Authorization header with format `Bearer {token}`")
 
-			ginContext.JSON(err.Status(), gin.H{
+			ctx.JSON(err.Status(), gin.H{
 				"error": err,
 			})
-			ginContext.Abort()
+			ctx.Abort()
 			return
 		}
 
@@ -48,20 +48,20 @@ func AuthUser(s models.TokenService) gin.HandlerFunc {
 
 		if err != nil {
 			err := apperrors.NewAuthorization("Provided token is invalid")
-			ginContext.JSON(err.Status(), gin.H{
+			ctx.JSON(err.Status(), gin.H{
 				"error": err,
 			})
-			ginContext.Abort()
+			ctx.Abort()
 			return
 		}
 
-		ginContext.Set("user", user)
+		ctx.Set("user", user)
 
-		ginContext.Next()
+		ctx.Next()
 	}
 }
 
-func handleError(ginContext *gin.Context, err error) {
+func handleError(ctx *gin.Context, err error) {
 	if errs, ok := err.(validator.ValidationErrors); ok {
 		var invalidArgs []invalidArgument
 
@@ -76,16 +76,16 @@ func handleError(ginContext *gin.Context, err error) {
 
 		err := apperrors.NewBadRequest("Invalid request parameters. See invalidArgs")
 
-		ginContext.JSON(err.Status(), gin.H{
+		ctx.JSON(err.Status(), gin.H{
 			"error":       err,
 			"invalidArgs": invalidArgs,
 		})
-		ginContext.Abort()
+		ctx.Abort()
 		return
 	}
 
 	error := apperrors.NewInternal()
-	ginContext.JSON(error.Status(), gin.H{
+	ctx.JSON(error.Status(), gin.H{
 		"error": error,
 	})
 }
